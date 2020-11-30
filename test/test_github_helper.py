@@ -2,21 +2,26 @@ import pytest
 import shutil
 from utils.github_helper import GithubHelper
 import os
+from utils.logger import init_logger
+
+@pytest.fixture(scope="session", autouse=True)
+def init():
+    # prepare something ahead of all tests
+    init_logger()
 
 
 @pytest.mark.parametrize("repo, cwd, result", [("mciniselli/test", "test_folder/github_helper/output", True),
                                                ("mciniselli/test222", "test_folder/github_helper/output", False)])
 def test_clone(repo, cwd, result):
-    shutil.rmtree(cwd, ignore_errors=True)
-    os.makedirs(cwd)
+
 
     g = GithubHelper()
     g.clone(repo, cwd)
 
-    r=False
+    r = False
 
-    if len(os.listdir(cwd))>0:
-        r=True
+    if len(os.listdir(cwd)) > 0:
+        r = True
 
     if r == result:
         assert True
@@ -39,25 +44,69 @@ def test_is_similar_to_tag(command, result):
 
     assert False
 
-@pytest.mark.parametrize("repo, cwd, result", [("mciniselli/test", "test_folder/github_helper/output", True),
-                                               ("mciniselli/test222", "test_folder/github_helper/output", False)])
-def test_get_last_release(repo, cwd, result):
-    shutil.rmtree(cwd, ignore_errors=True)
-    os.makedirs(cwd)
+
+@pytest.mark.parametrize("cwd, result", [("test_folder/github_helper/check_tags_branch/test", "3.0"),
+                                               ("test_folder/github_helper/check_tags_branch/test_branch", "3.1")])
+def test_get_last_release(cwd, result):
 
     g = GithubHelper()
+    release, is_tag=g.get_last_release(cwd)
+
+    if release==result:
+        assert True
+        return
+
+    assert False
+
+@pytest.mark.parametrize("cwd, result", [("test_folder/github_helper/check_tags_branch/test", "3.0")])
+def test_get_list_of_tags(cwd, result):
+
+    g = GithubHelper()
+
+    res, _=g.get_list_of_tags(cwd)
+
+    res=res.split("\n")[0]
+    tag=res.split(" ")[-1]
+    print(tag)
+    if tag==result:
+        assert True
+        return
+
+
+    assert False
+
+@pytest.mark.parametrize("cwd, result", [("test_folder/github_helper/check_tags_branch/test", "remotes/origin/3.0.1"),
+                                         ("test_folder/github_helper/check_tags_branch/test_branch", "remotes/origin/3.1")])
+def test_get_list_of_branches(cwd, result):
+
+    g = GithubHelper()
+
+    res, _=g.get_list_of_branches(cwd)
+
+    res=res.split("\n")
+    for r in res:
+        if r.strip()==result:
+            assert True
+            return
+
+    assert False
+
+
+@pytest.mark.parametrize("repo, cwd", [("mciniselli/test_branch", "test_folder/github_helper/check_tags_branch"),
+                                                  ("mciniselli/test", "test_folder/github_helper/check_tags_branch")])
+def test_checkout(repo, cwd):
+    g=GithubHelper()
     g.clone(repo, cwd)
 
-    g.get_list_of_tags(cwd)
+    name=repo.split("/")[-1]
+    folder=os.path.join(cwd, name)
 
+    g.checkout(folder)
 
+    files=os.listdir(folder)
+    if "TBD.txt" in files:
+        assert False
+        return
 
-    assert False
+    assert True
 
-
-def test_get_list_of_tags():
-    assert False
-
-
-def test_get_list_of_branches():
-    assert False

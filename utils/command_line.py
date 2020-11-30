@@ -1,8 +1,7 @@
 from subprocess import Popen, PIPE, STDOUT, TimeoutExpired
-import logging
 import os
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s :: %(levelname)s :: %(message)s')
+import utils.logger as logger
 
 class CommandLineHelper():
 
@@ -18,6 +17,8 @@ class CommandLineHelper():
     '''
     def exec(self, cmd, cwd):
         p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, close_fds=True, cwd=cwd)
+
+        logger.log.info("run command {}".format(cmd))
 
         try:
             output, error = p.communicate(timeout=60)
@@ -40,8 +41,6 @@ class CommandLineHelper():
             return True
         if len(self.error)==0:
             return True
-
-        print("ERROR: !{}!".format(self.error))
 
         return False
 
