@@ -2,13 +2,15 @@ import os
 import shutil
 from utils.command_line import CommandLineHelper
 
-import utils.logger as logger
-
+from utils.logger import Logger
 
 class GithubHelper():
 
     def __init__(self):
         self.cmd = None
+
+        self.log_class=Logger()
+        self.log=self.log_class.log
 
     '''
     Clone the repository @repo in the @directory
@@ -19,7 +21,7 @@ class GithubHelper():
         shutil.rmtree(directory, ignore_errors=True)
         os.makedirs(directory)
 
-        logger.log.info("Cloning repository:")
+        self.log.info("Cloning repository:")
         cmd = 'git clone https://test:test@github.com/{}.git'.format(repo)
         self.cmd = cmd
         c = CommandLineHelper()
@@ -58,8 +60,8 @@ class GithubHelper():
 
         tags, command_ok = self.get_list_of_tags(directory)
 
-        logger.log.info("list of tags:")
-        logger.log.info(str(tags))
+        self.log.info("list of tags:")
+        self.log.info(str(tags))
 
         if not command_ok:
             return -1, True
@@ -80,7 +82,7 @@ class GithubHelper():
             tags = tags.split("\n")[0]
             last_tag = tags.split(" ")[-1]
 
-            logger.log.info("last tag: {}".format(last_tag))
+            l.log.info("last tag: {}".format(last_tag))
 
             return last_tag, True
 
@@ -109,7 +111,7 @@ class GithubHelper():
 
     def checkout(self, directory):
 
-        version, is_tag=self.get_last_release(directory)
+        version, is_tag = self.get_last_release(directory)
 
         cmd = ""
         if is_tag:

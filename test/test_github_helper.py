@@ -2,12 +2,12 @@ import pytest
 import shutil
 from utils.github_helper import GithubHelper
 import os
-from utils.logger import init_logger
+# from utils.logger import Logger
 
-@pytest.fixture(scope="session", autouse=True)
-def init():
-    # prepare something ahead of all tests
-    init_logger()
+# @pytest.fixture(scope="session", autouse=True)
+# def init():
+#     # prepare something ahead of all tests
+
 
 
 @pytest.mark.parametrize("repo, cwd, result", [("mciniselli/test", "test_folder/github_helper/output", True),
@@ -67,7 +67,7 @@ def test_get_list_of_tags(cwd, result):
 
     res=res.split("\n")[0]
     tag=res.split(" ")[-1]
-    print(tag)
+
     if tag==result:
         assert True
         return

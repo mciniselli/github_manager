@@ -1,7 +1,7 @@
 from subprocess import Popen, PIPE, STDOUT, TimeoutExpired
 import os
 
-import utils.logger as logger
+from utils.logger import Logger
 
 class CommandLineHelper():
 
@@ -9,6 +9,9 @@ class CommandLineHelper():
         self.cmd=None
         self.output=None
         self.error=None
+
+        self.log_class=Logger()
+        self.log=self.log_class.log
 
     '''
     This function execute the command @cmd using @cwd as working directory
@@ -18,7 +21,7 @@ class CommandLineHelper():
     def exec(self, cmd, cwd):
         p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, close_fds=True, cwd=cwd)
 
-        logger.log.info("run command {}".format(cmd))
+        self.log.info("run command {}".format(cmd))
 
         try:
             output, error = p.communicate(timeout=60)
