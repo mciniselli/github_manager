@@ -33,15 +33,6 @@ class SrcmlParser():
     def apply_filters_if(self):
 
 
-        '''
-        		<if_stmt><if>if <condition>(<expr><name>test</name></expr>)</condition><block>{<block_content>
-			<return>return <expr><name>range</name></expr>;</return>
-			<return>return <expr><name>test</name></expr>;</return>
-		</block_content>}</block></if></if_stmt>
-        '''
-
-
-
 
         methods=self.methods
         for m in methods:
@@ -57,11 +48,9 @@ class SrcmlParser():
                 #
                 # f.tree=parent
 
-                # f.print_tree()
+                f.print_tree()
 
-                start="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><unit xmlns=\"http://www.srcML.org/srcML/src\" revision=\"1.0.0\" language=\"Java\" filename=\"file_1.java\">"
-                end="</unit>"
-                test = "<if>if <condition>(<expr><name>test</name></expr>)</condition><block>{<block_content><return>return <expr><name>range</name></expr>;</return><return>return <expr><name>test</name></expr>;</return></block_content>}</block></if>"
+                test = "<if>if <condition>(<expr><name>test</name></expr>)</condition></if>"
 
                 f2 = SrcmlFilters(test, True)
 

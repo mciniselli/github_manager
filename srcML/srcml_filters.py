@@ -16,6 +16,7 @@ NAME = "name"
 TEXT = "text"
 IF = "if"
 BLOCK = "block"
+SKIP=[None, BLOCK]
 
 class KeyValueNode():
     def __init__(self, key, value):
@@ -31,8 +32,8 @@ class SrcmlFilters():
         xml_code_curr=xml_code
 
         if is_string: # this is a bs4 object created by scrml_parser
-            xml_code_curr = BeautifulSoup(xml_code, 'xml')
-
+            xml_code_curr = BeautifulSoup(xml_code, 'lxml')
+            xml_code_curr=xml_code_curr.select('if')[0]
 
         self.xml_code=xml_code
         self.tree=None
@@ -45,13 +46,7 @@ class SrcmlFilters():
             print("ERROR CREATION TREE")
 
 
-
-
-    # def __int__(self, text, test):
-    #     self.xml_code = xml_code
-    #     self.soup = BeautifulSoup(self.xml_code, 'lxml')
-
-    def get_list_of_children(self, parent, skip=[None, BLOCK]):
+    def get_list_of_children(self, parent, skip=SKIP):
         children = list()
         try:
             for child in parent.children:
@@ -62,7 +57,7 @@ class SrcmlFilters():
             return list()
 
 
-    def get_list_of_children_with_text(self, parent, skip=[None, BLOCK]):
+    def get_list_of_children_with_text(self, parent, skip=SKIP):
         children = list()
         try:
             for child in parent.children:
@@ -103,64 +98,8 @@ class SrcmlFilters():
             print("%s%s" % (pre, node.name))
 
 
-    def check_if_tree_are_equal_(self, tree1, tree2, skip, check_order):
-
-        sort_keys=True
-        if check_order:
-            sort_keys=False
-
-        exporter = JsonExporter(indent=4, sort_keys=sort_keys) #sorting pericoloso, eliminare
-        json1=exporter.export(tree1)
-        json2=exporter.export(tree2)
-
-        json1 = json.dumps(json1, sort_keys=sort_keys)
-        json2 = json.dumps(json2, sort_keys=sort_keys)
-        print(json1 == json2)
-        # self.navigate_json(json1)
-
-    def navigate_json(self, json):
-        data=json.load(json)
-        a=1
-
-    def return_unordered_condition(self, list_items):
-        dict_cond=dict()
-        for l in list_items:
-            items=l.split(" ")
-            key=int(items[0])
-            if key not in dict_cond.keys():
-                dict_cond[key]=list()
-            dict_cond[key].append(items[1])
-        return dict_cond
-
-    def return_condition_from_xml(self):
-
-        xml_current_level=self.xml_code
-
-        udo = Node("Udo")
-        marc = Node("Marc", parent=udo)
-        lian = Node("Lian", parent=marc)
-        dan = Node("Dan", parent=udo)
-        jet = Node("Jet", parent=dan)
-        jan = Node("Jan", parent=dan)
-        joe = Node("Joe", parent=dan)
 
 
-    def check_condition(self, condition):
-        dict_cond=self.return_unordered_condition(condition)
-
-        xml_current_level=self.xml_code
-        for level in dict_cond.keys():
-            level_curr=self.get_list_of_children(xml_current_level)
-            if collections.Counter(level_curr) != collections.Counter(dict_cond[level]):
-                return False
-
-            xml_current_level=xml_current_level.findChild()
-
-        level_curr = self.get_list_of_children(xml_current_level)
-        if len(level_curr)> 0:
-            return False
-
-        return True
 
     def contain_operator_name(self):
 
@@ -170,7 +109,10 @@ class SrcmlFilters():
 
     def contain_name(self):
 
-        condition=["1 condition", "2 expr", "3 name"]
+        condition = "<if>if <condition>(<expr><name>test</name></expr>)</condition></if>"
+        pattern = SrcmlFilters(condition, True)
+        check_if_tree_are_equal(pattern.tree, self.tree, SKIP)
+
         return self.check_condition(condition)
 
     def contain_operator_name_literal(self):
@@ -192,24 +134,6 @@ class SrcmlFilters():
     def contain_equal(self):
         condition=["1 condition", "2 expr", "3 operator", "3 call", "4 call", "5 name", "6 name", "6 operator", "6 name"]
 
-
-    def t(self):
-        udo = Node("Udo")
-        marc = Node("Marc", parent=udo)
-        lian = Node("Lian", parent=marc)
-        dan = Node("Dan", parent=udo)
-        jet = Node("Jet", parent=dan)
-        jan = Node("Jan", parent=dan)
-        joe = Node("Joe", parent=dan)
-
-        print(udo)
-        Node('/Udo')
-        print(joe)
-        Node('/Udo/Dan/Joe')
-
-        for pre, fill, node in RenderTree(udo):
-            print("%s%s" % (pre, node.name))
-
 def equal_leaf(leaf1, leaf2):
     if leaf1.value == "":
         return True
@@ -219,24 +143,7 @@ def equal_leaf(leaf1, leaf2):
 
     return False
 
-def check_if_tree_are_equal_OLD(tree1, tree2):
 
-    if tree1.children == None and tree2.children == None:
-        return equal_leaf(tree1, tree2)
-
-    child_1=tree1.children
-    child_2=tree2.children
-
-    if len(child_1) != len(child_2):
-        return False
-
-    result=True
-
-    for x, y in zip(child_1, child_2):
-        res=check_if_tree_are_equal(x,y)
-        result*=res
-
-    return result
 
 
 def check_if_tree_are_equal(tree1, tree2, skip):
