@@ -1,6 +1,9 @@
 from bs4 import BeautifulSoup
 from srcML.srcml_filters import SrcmlFilters
 
+from anytree import Node, RenderTree
+
+
 class SrcmlParser():
     def __init__(self, xml_code):
         self.methods = list()
@@ -31,8 +34,32 @@ class SrcmlParser():
         methods=self.methods
         for m in methods:
             if_conditions=self.extract_all_tags("if", m)
+
             print(len(if_conditions))
             for if_condition in if_conditions:
                 f = SrcmlFilters(if_condition)
-                res=f.contain_operator_name()
-                print(res)
+                # res=f.contain_operator_name()
+                # print(res)
+                parent=Node("if")
+                f.add_children_to_node_with_text(parent, if_condition, skip=[None, "block"])
+
+                f.tree=parent
+
+                f.print_tree()
+                f2=SrcmlFilters(if_condition)
+
+                parent2=Node("if")
+
+
+                f2.add_children_to_node_with_text(parent2, if_condition, skip=[None, "block"])
+
+                f2.tree=parent2
+
+                f2.check_if_tree_are_equal(f.tree, f2.tree, [None, "block"], False)
+
+
+                from srcML.srcml_filters import check_if_tree_are_equal
+
+                check_if_tree_are_equal(f.tree, f2.tree)
+
+

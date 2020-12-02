@@ -339,6 +339,36 @@ def test_srcml_parser():
 
     s.apply_filters_if()
 
+def test_tree():
+    from anytree import Node, RenderTree
+
+    udo = Node("Udo")
+    marc = Node("Marc", parent=udo)
+    lian = Node("Lian", parent=marc)
+    dan = Node("Dan", parent=udo)
+    jet = Node("Jet", parent=dan)
+    jan = Node("Jan", parent=dan)
+    joe = Node("Joe", parent=dan)
+
+    print("CHILD")
+    print(dan.children)
+    print(dan.name)
+
+    print(udo)
+    Node('/Udo')
+    print(joe)
+    Node('/Udo/Dan/Joe')
+
+    for pre, fill, node in RenderTree(udo):
+        print("%s%s" % (pre, node.name))
+
+    from anytree.exporter import JsonExporter
+
+    exporter = JsonExporter(indent=2, sort_keys=True)
+    print("EXPORT")
+    print(exporter.export(udo))
+
 if __name__=="__main__":
     # main()
     test_srcml_parser()
+    # test_tree()
