@@ -31,6 +31,18 @@ class SrcmlParser():
         self.contain_if = False
 
     def apply_filters_if(self):
+
+
+        '''
+        		<if_stmt><if>if <condition>(<expr><name>test</name></expr>)</condition><block>{<block_content>
+			<return>return <expr><name>range</name></expr>;</return>
+			<return>return <expr><name>test</name></expr>;</return>
+		</block_content>}</block></if></if_stmt>
+        '''
+
+
+
+
         methods=self.methods
         for m in methods:
             if_conditions=self.extract_all_tags("if", m)
@@ -40,26 +52,36 @@ class SrcmlParser():
                 f = SrcmlFilters(if_condition)
                 # res=f.contain_operator_name()
                 # print(res)
-                parent=Node("if")
-                f.add_children_to_node_with_text(parent, if_condition, skip=[None, "block"])
+                # parent=Node("if")
+                # f.add_children_to_node_with_text(parent, if_condition, skip=[None, "block"])
+                #
+                # f.tree=parent
 
-                f.tree=parent
+                # f.print_tree()
 
-                f.print_tree()
-                f2=SrcmlFilters(if_condition)
+                start="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><unit xmlns=\"http://www.srcML.org/srcML/src\" revision=\"1.0.0\" language=\"Java\" filename=\"file_1.java\">"
+                end="</unit>"
+                test = "<if>if <condition>(<expr><name>test</name></expr>)</condition><block>{<block_content><return>return <expr><name>range</name></expr>;</return><return>return <expr><name>test</name></expr>;</return></block_content>}</block></if>"
 
-                parent2=Node("if")
+                f2 = SrcmlFilters(test, True)
 
+                f2.print_tree()
 
-                f2.add_children_to_node_with_text(parent2, if_condition, skip=[None, "block"])
+                # f2=SrcmlFilters(if_condition)
 
-                f2.tree=parent2
+                # parent2=Node("if")
+                #
+                #
+                # f2.add_children_to_node_with_text(parent2, if_condition, skip=[None, "block"])
+                #
+                # f2.tree=parent2
 
-                f2.check_if_tree_are_equal(f.tree, f2.tree, [None, "block"], False)
-
-
+                # f2.check_if_tree_are_equal(f.tree, f2.tree, [None, "block"], False)
+                #
+                #
                 from srcML.srcml_filters import check_if_tree_are_equal
 
-                check_if_tree_are_equal(f.tree, f2.tree)
+                rr=check_if_tree_are_equal(f.tree, f2.tree, [None, "block"])
+                print(rr)
 
 
