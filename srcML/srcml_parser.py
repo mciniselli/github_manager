@@ -1,9 +1,6 @@
 from bs4 import BeautifulSoup
 from srcML.srcml_filters import SrcmlFilters
 
-from anytree import Node, RenderTree
-
-
 class SrcmlParser():
     def __init__(self, xml_code):
         self.methods = list()
