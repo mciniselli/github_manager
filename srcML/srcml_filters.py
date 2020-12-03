@@ -110,10 +110,14 @@ class SrcmlFilters():
     def check_condition(self, conditions):
         for condition in conditions:
             comparison_tree = SrcmlFilters(condition, True)
-
+            # comparison_tree.print_tree()
             result = check_if_tree_are_equal(comparison_tree.tree, self.tree, Fields.SKIP.value)
 
             if result:
+
+                # self.print_tree()
+                comparison_tree.print_tree()
+
                 return True
 
         return False
@@ -148,7 +152,6 @@ class SrcmlFilters():
         conditions = [
             "<if><condition>(<expr><operator></operator><call><name><name_literal></name_literal><operator>.</operator><name>equal</name></name><argument_list>(<argument><expr><name_literal></name_literal></expr></argument>)</argument_list></call><operator></operator><name_literal></name_literal></expr>)</condition></if>",
             "<if><condition>(<expr><call><name><name_literal></name_literal><operator>.</operator><name>equal</name></name><argument_list>(<argument><expr><name_literal></name_literal></expr></argument>)</argument_list></call><operator></operator><name_literal></name_literal></expr>)</condition></if>"]
-
         return self.check_condition(conditions)
 
     def apply_all_filters(self):
@@ -174,9 +177,6 @@ class SrcmlFilters():
             return True
 
         return False
-
-
-
 
 
 def equal_value(node_target, node2):
@@ -216,6 +216,6 @@ def check_if_tree_are_equal(tree1, tree2, skip):
         res_value = equal_key(x, y)
 
         res = check_if_tree_are_equal(x, y, skip)
-        result = res and res_key and res_value
+        result = result * res and res_key and res_value
 
     return result

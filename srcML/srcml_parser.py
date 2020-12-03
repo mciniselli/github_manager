@@ -36,7 +36,7 @@ class SrcmlParser():
             if_conditions=self.extract_all_tags("if", m)
 
             print(len(if_conditions))
-            for if_condition in if_conditions[-1:]:
+            for if_condition in if_conditions:
                 print(if_condition.text)
                 f = SrcmlFilters(if_condition)
                 f.print_tree()
