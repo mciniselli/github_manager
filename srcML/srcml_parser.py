@@ -50,9 +50,18 @@ class SrcmlParser():
 
                 f.print_tree()
 
-                test = "<if>if <condition>(<expr><name>test</name></expr>)</condition></if>"
+                # if (name)
+                test = "<if><condition>(<expr><name></name></expr>)</condition></if>"
+
+                # if (!name)
+                test="<if><condition>(<expr><operator></operator><name></name></expr>)</condition></if>"
+
+                # of ( name != 10)
+                test="<if><condition>(<expr><name></name><operator></operator><literal></literal></expr>)</condition></if>"
+
 
                 f2 = SrcmlFilters(test, True)
+
 
                 f2.print_tree()
 
@@ -70,7 +79,10 @@ class SrcmlParser():
                 #
                 from srcML.srcml_filters import check_if_tree_are_equal
 
-                rr=check_if_tree_are_equal(f.tree, f2.tree, [None, "block"])
-                print(rr)
+                rr=check_if_tree_are_equal(f2.tree, f.tree, [None, "block"])
+
+                if rr==1:
+                    print(rr)
+                    return
 
 
