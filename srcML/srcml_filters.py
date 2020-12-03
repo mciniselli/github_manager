@@ -12,11 +12,24 @@ from anytree.exporter import JsonExporter
 # usare enumerate o simile come chiave valore  if -> enum.if
 
 
-NAME = "name"
-TEXT = "text"
-IF = "if"
-BLOCK = "block"
-SKIP = [None, BLOCK]
+# NAME = "name"
+# TEXT = "text"
+# IF = "if"
+# BLOCK = "block"
+# SKIP = [None, BLOCK]
+
+import enum
+# Using enum class create enumerations
+class Fields(enum.Enum):
+   NAME = "name"
+   TEXT = "text"
+   IF = "if"
+   BLOCK = "block"
+   SKIP = [None, BLOCK]
+
+   SPECIAL_TAG=["name_literal"]
+   name_literal = ["name", "literal"]
+
 
 class KeyValueNode():
     def __init__(self, key, value):
@@ -46,22 +59,22 @@ class SrcmlFilters():
         except Exception as e:
             print("ERROR CREATION TREE")
 
-    def get_list_of_children(self, parent, skip=SKIP):
+    def get_list_of_children(self, parent, skip=Fields.SKIP.value):
         children = list()
         try:
             for child in parent.children:
-                if hasattr(child, NAME) and child.name is not None:
+                if hasattr(child, Fields.NAME.value) and child.name is not None:
                     children.append(child.name)
             return [c for c in children if c not in skip]
         except Exception as e:
             return list()
 
-    def get_list_of_children_with_text(self, parent, skip=SKIP):
+    def get_list_of_children_with_text(self, parent, skip=Fields.SKIP.value):
         children = list()
         try:
             for child in parent.children:
-                if hasattr(child, NAME) and child.name is not None:
-                    if hasattr(child, TEXT) and child.text is not None:
+                if hasattr(child, Fields.NAME.value) and child.name is not None:
+                    if hasattr(child, Fields.TEXT.value) and child.text is not None:
                         text = child.text
                         node = KeyValueNode(child.name, text)
                     children.append(node)  # change in tuple using a object
@@ -98,7 +111,7 @@ class SrcmlFilters():
         for condition in conditions:
             comparison_tree = SrcmlFilters(condition, True)
 
-            result = check_if_tree_are_equal(comparison_tree.tree, self.tree, SKIP)
+            result = check_if_tree_are_equal(comparison_tree.tree, self.tree, Fields.SKIP.value)
 
             if result:
                 return True
@@ -133,8 +146,37 @@ class SrcmlFilters():
     def contain_equal(self):
 
         conditions = [
-            "<if><condition>(<expr><operator></operator><call><name><name></name><operator>.</operator><name>equal</name></name><argument_list>(<argument><expr><literal></literal></expr></argument>)</argument_list></call><operator></operator><name></name></expr>)</condition></if>"]
+            "<if><condition>(<expr><operator></operator><call><name><name_literal></name_literal><operator>.</operator><name>equal</name></name><argument_list>(<argument><expr><name_literal></name_literal></expr></argument>)</argument_list></call><operator></operator><name_literal></name_literal></expr>)</condition></if>",
+            "<if><condition>(<expr><call><name><name_literal></name_literal><operator>.</operator><name>equal</name></name><argument_list>(<argument><expr><name_literal></name_literal></expr></argument>)</argument_list></call><operator></operator><name_literal></name_literal></expr>)</condition></if>"]
+
         return self.check_condition(conditions)
+
+    def apply_all_filters(self):
+        if self.contain_name():
+            print("CONTAIN_NAME")
+            return True
+
+        if self.contain_operator_name():
+            print("CONTAIN_OPERATOR_NAME")
+            return True
+
+        if self.contain_operator_name_name():
+            print("CONTAIN_OPERATOR_NAME_NAME")
+            return True
+
+
+        if self.contain_operator_name_literal():
+            print("CONTAIN_OPERATOR_NAME_LITERAL")
+            return True
+
+        if self.contain_equal():
+            print("CONTAIN_EQUAL")
+            return True
+
+        return False
+
+
+
 
 
 def equal_value(node_target, node2):
@@ -147,9 +189,15 @@ def equal_value(node_target, node2):
     return False
 
 
-def equal_key(node1, node2):
-    return node1.name.key == node2.name.key
+def equal_key(node_target, node2):
 
+    if node_target.name.key in Fields.SPECIAL_TAG.value:
+        allowed_tags=Fields.__getitem__(node_target.name.key).value
+        if node2.name.key in allowed_tags:
+            return True
+        return False
+
+    return node_target.name.key == node2.name.key
 
 def check_if_tree_are_equal(tree1, tree2, skip):
     child_1 = [t for t in tree1.children if t.name.key not in skip]

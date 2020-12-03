@@ -31,6 +31,19 @@ class SrcmlParser():
         self.contain_if = False
 
     def apply_filters_if(self):
+        methods=self.methods
+        for m in methods:
+            if_conditions=self.extract_all_tags("if", m)
+
+            print(len(if_conditions))
+            for if_condition in if_conditions[-1:]:
+                print(if_condition.text)
+                f = SrcmlFilters(if_condition)
+                f.print_tree()
+                f.apply_all_filters()
+                print("_____________________")
+
+    def apply_filters_if_old(self):
 
 
 
@@ -59,6 +72,7 @@ class SrcmlParser():
                 # of ( name != 10)
                 test="<if><condition>(<expr><name></name><operator></operator><literal></literal></expr>)</condition></if>"
 
+                test="<if><condition>(<expr><operator></operator><call><name><name_literal></name_literal><operator>.</operator><name>equal</name></name><argument_list>(<argument><expr><name_literal></name_literal></expr></argument>)</argument_list></call><operator></operator><name_literal></name_literal></expr>)</condition></if>"
 
                 f2 = SrcmlFilters(test, True)
 
