@@ -2,6 +2,8 @@ from utils.command_line import CommandLineHelper
 
 from utils.github_helper import GithubHelper
 
+from srcML.srcml_filters import SrcmlFilters, KeyValueNode, Fields
+
 class Operation():
 
     def max(values):
@@ -368,7 +370,14 @@ def test_tree():
     print("EXPORT")
     print(exporter.export(udo))
 
+def test_merge_tree():
+    s = SrcmlFilters("<if></if>", True)
+    s2 = SrcmlFilters("<fake><condition>(<expr><operator></operator><name></name></expr>)</condition></fake>", True)
+    s.add_children_to_node(s.tree, s2.xml_code, Fields.SKIP.value)
+    s.print_tree()
+
 if __name__=="__main__":
     # main()
     test_srcml_parser()
     # test_tree()
+    # test_merge_tree()

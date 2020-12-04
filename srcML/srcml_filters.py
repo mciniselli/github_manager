@@ -66,7 +66,7 @@ class SrcmlFilters():
         children = list()
         try:
             for child in parent.children:
-                if hasattr(child, Fields.NAME.value) and child.name is not None:
+                if hasattr(child, Fields.NAME.value) and child.name is not None: #check if child["name"]
                     if hasattr(child, Fields.TEXT.value) and child.text is not None:
                         text = child.text
                         node = KeyValueNode(child.name, text)
@@ -120,10 +120,8 @@ class SrcmlFilters():
             result = check_if_tree_are_equal(comparison_tree.tree, self.tree, Fields.SKIP.value)
 
             if result:
-
                 # self.print_tree()
                 comparison_tree.print_tree()
-
                 return True
 
         return False
