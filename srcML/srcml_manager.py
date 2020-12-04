@@ -10,7 +10,10 @@ class SrcmlManager():
         self.log_class=Logger()
         self.log=self.log_class.log
 
-    def read_file(self, filepath):  # read generic file
+    def read_file(self, filepath):
+        '''
+        Given a file path @filepath, the function reads the content of the file and, after a rstrip, it returns a list of all lines
+        '''
         try:
             with open(filepath, encoding="utf-8") as f:
                 content = f.readlines()
@@ -25,7 +28,11 @@ class SrcmlManager():
         return c_
 
     def process_with_srcml(self, java_path):
+        '''
+        This function uses CommandLineHelper to invoke srcMl and create the xml file.
+        This file is saved in the same folder of the java file
 
+        '''
         c=CommandLineHelper()
         xml_path=java_path.replace(".java", ".xml")
         file_dir="/".join(java_path.split("/")[:-1])
@@ -35,4 +42,7 @@ class SrcmlManager():
         self.xml_code=self.read_file(xml_path)
 
     def get_xml(self):
+        '''
+        This function returns all the lines of xml code processed by srcML, splitted by a \n char
+        '''
         return "\n".join(self.xml_code)

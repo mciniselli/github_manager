@@ -5,6 +5,7 @@ from anytree.exporter import JsonExporter
 
 import enum
 
+from utils.logger import Logger
 
 # Using enum class create enumerations
 class Fields(enum.Enum):
@@ -41,6 +42,9 @@ class SrcmlFilters():
 
         self.xml_code = xml_code_curr
         self.tree = None
+
+        self.log_class = Logger()
+        self.log = self.log_class.log
 
         try:
 

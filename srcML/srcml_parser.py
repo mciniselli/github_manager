@@ -1,6 +1,8 @@
 from bs4 import BeautifulSoup
 from srcML.srcml_filters import SrcmlFilters
 
+from utils.logger import Logger
+
 class SrcmlParser():
     def __init__(self, xml_code):
         self.methods = list()
@@ -8,7 +10,16 @@ class SrcmlParser():
         self.soup = BeautifulSoup(self.xml_code, 'lxml')
         self.contain_if = None
 
+        self.log_class = Logger()
+        self.log = self.log_class.log
+
     def extract_all_tags(self, tag, node):
+        '''
+        This function use the select operator defined by beautifulsoup to return the list of all tag @tag
+        inside the node @node
+        We can choose every node
+        '''
+
         tags = node.select(tag)
         return tags
 

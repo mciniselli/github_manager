@@ -13,12 +13,13 @@ class CommandLineHelper():
         self.log_class=Logger()
         self.log=self.log_class.log
 
-    '''
-    This function execute the command @cmd using @cwd as working directory
-    Then save the output in @self.output and the error in @self.error
-    At the end return @output and @error
-    '''
+
     def exec(self, cmd, cwd):
+        '''
+        This function execute the command @cmd using @cwd as working directory
+        Then save the output in @self.output and the error in @self.error
+        At the end return @output and @error
+        '''
         p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, close_fds=True, cwd=cwd)
 
         self.log.info("run command {}".format(cmd))
@@ -36,10 +37,12 @@ class CommandLineHelper():
 
         return output, error
 
-    '''
-    This function check if previous command is OK, reading the content of @self.error
-    '''
+
     def is_command_ok(self):
+        '''
+        This function check if previous command is OK, reading the content of @self.error
+        Sometimes there are commands that use the std error in a wrong way (e.g. the message cloning from git clone come out from std error)
+        '''
         if self.error==None:
             return True
         if len(self.error)==0:
