@@ -1,20 +1,21 @@
-
 from bs4 import BeautifulSoup
 
 from anytree import Node, RenderTree
 from anytree.exporter import JsonExporter
 
 import enum
+
+
 # Using enum class create enumerations
 class Fields(enum.Enum):
-   NAME = "name"
-   TEXT = "text"
-   IF = "if"
-   BLOCK = "block"
-   SKIP = [None, BLOCK]
+    NAME = "name"
+    TEXT = "text"
+    IF = "if"
+    BLOCK = "block"
+    SKIP = [None, BLOCK]
 
-   SPECIAL_TAG=["name_literal"]
-   name_literal = ["name", "literal"]
+    SPECIAL_TAG = ["name_literal"]
+    name_literal = ["name", "literal"]
 
 
 class KeyValueNode():
@@ -25,6 +26,7 @@ class KeyValueNode():
     def __str__(self):
         return "{} {}".format(self.key, self.value)
 
+
 class SrcmlFilters():
     def __init__(self, xml_code, is_string=False):
 
@@ -34,7 +36,7 @@ class SrcmlFilters():
             xml_code_curr = BeautifulSoup(xml_code, 'lxml')
 
             xml_code_curr = xml_code_curr.select('body')[0]
-            child=self.get_list_of_children(xml_code_curr)[0]
+            child = self.get_list_of_children(xml_code_curr)[0]
             xml_code_curr = xml_code_curr.select(child)[0]
 
         self.xml_code = xml_code_curr
@@ -42,11 +44,11 @@ class SrcmlFilters():
 
         try:
 
-            text=""
+            text = ""
             if hasattr(xml_code_curr, Fields.TEXT.value):
-                text=xml_code_curr.text
+                text = xml_code_curr.text
 
-            parent = Node( KeyValueNode(xml_code_curr.name, xml_code_curr.text))
+            parent = Node(KeyValueNode(xml_code_curr.name, xml_code_curr.text))
             self.add_children_to_node_with_text(parent, xml_code_curr, skip=[None, "block"])
             self.tree = parent
         except Exception as e:
@@ -66,7 +68,7 @@ class SrcmlFilters():
         children = list()
         try:
             for child in parent.children:
-                if hasattr(child, Fields.NAME.value) and child.name is not None: #check if child["name"]
+                if hasattr(child, Fields.NAME.value) and child.name is not None:  # check if child["name"]
                     if hasattr(child, Fields.TEXT.value) and child.text is not None:
                         text = child.text
                         node = KeyValueNode(child.name, text)
@@ -82,7 +84,7 @@ class SrcmlFilters():
         try:
             for child in parent.children:
                 if hasattr(child, Fields.NAME.value) and child.name is not None:
-                    node=child.name
+                    node = child.name
                     children.append(node)
             return [c for c in children if c.key not in skip]
         except Exception as e:
@@ -155,7 +157,10 @@ class SrcmlFilters():
 
         conditions = [
             "<if><condition>(<expr><operator></operator><call><name><name_literal></name_literal><operator>.</operator><name>equal</name></name><argument_list>(<argument><expr><name_literal></name_literal></expr></argument>)</argument_list></call><operator></operator><name_literal></name_literal></expr>)</condition></if>",
-            "<if><condition>(<expr><call><name><name_literal></name_literal><operator>.</operator><name>equal</name></name><argument_list>(<argument><expr><name_literal></name_literal></expr></argument>)</argument_list></call><operator></operator><name_literal></name_literal></expr>)</condition></if>"]
+            "<if><condition>(<expr><call><name><name_literal></name_literal><operator>.</operator><name>equal</name></name><argument_list>(<argument><expr><name_literal></name_literal></expr></argument>)</argument_list></call><operator></operator><name_literal></name_literal></expr>)</condition></if>",
+            "<if><condition>(<expr><operator></operator><call><name><name_literal></name_literal><operator>.</operator><name>equal</name></name><argument_list>(<argument><expr><name_literal></name_literal></expr></argument>)</argument_list></call></expr>)</condition></if>",
+            "<if><condition>(<expr><call><name><name_literal></name_literal><operator>.</operator><name>equal</name></name><argument_list>(<argument><expr><name_literal></name_literal></expr></argument>)</argument_list></call></expr>)</condition></if>"
+        ]
         return self.check_condition(conditions)
 
     def apply_all_filters(self):
@@ -170,7 +175,6 @@ class SrcmlFilters():
         if self.contain_operator_name_name():
             print("CONTAIN_OPERATOR_NAME_NAME")
             return True
-
 
         if self.contain_operator_name_literal():
             print("CONTAIN_OPERATOR_NAME_LITERAL")
@@ -187,21 +191,21 @@ def equal_value(node_target, node2):
     if node_target.name.value == "":
         return True
 
-    if node_target.name.value == node2.name.value:
+    if node_target.name.value.strip() == node2.name.value.strip():
         return True
 
     return False
 
 
 def equal_key(node_target, node2):
-
     if node_target.name.key in Fields.SPECIAL_TAG.value:
-        allowed_tags=Fields.__getitem__(node_target.name.key).value
+        allowed_tags = Fields.__getitem__(node_target.name.key).value
         if node2.name.key in allowed_tags:
             return True
         return False
 
     return node_target.name.key == node2.name.key
+
 
 def check_if_tree_are_equal(tree1, tree2, skip):
     child_1 = [t for t in tree1.children if t.name.key not in skip]

@@ -376,8 +376,16 @@ def test_merge_tree():
     s.add_children_to_node(s.tree, s2.xml_code, Fields.SKIP.value)
     s.print_tree()
 
+def test_equal():
+    xml="<if><condition>(<expr><operator></operator><call><name><name></name><operator>.</operator><name>equal</name></name><argument_list>(<argument><expr><name></name></expr></argument>)</argument_list></call></expr>)</condition></if>"
+    s = SrcmlFilters(xml, True)
+    s.print_tree()
+    res = s.contain_equal()
+    print(res)
+
 if __name__=="__main__":
     # main()
-    test_srcml_parser()
+    # test_srcml_parser()
     # test_tree()
     # test_merge_tree()
+    test_equal()

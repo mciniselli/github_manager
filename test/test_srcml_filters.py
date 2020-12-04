@@ -115,16 +115,18 @@ def test_check_condition(xml, xml_2, result):
     ("<if><condition>(<expr><operator></operator><name></name></expr>)</condition></if>", True),
     ("<if>if <condition>(<expr><operator>!</operator><name>variable</name></expr>)</condition></if>", True),
     ("<if><condition>(<expr><name></name><operator></operator></expr>)</condition></if>", False),
-    ("<if><condition>(<expr><operator></operator><name></name></expr>)</condition></if><block><test>aa</test></block>", True),
+    ("<if><condition>(<expr><operator></operator><name></name></expr>)</condition></if><block><test>aa</test></block>",
+     True),
     ("<if><condition>(<operator></operator><name></name>)</condition></if>", False)])
 def test_contain_operator_name(xml, result):
     s = SrcmlFilters(xml, True)
-    res=s.contain_operator_name()
-    if res==result:
+    res = s.contain_operator_name()
+    if res == result:
         assert True
         return
 
     assert False
+
 
 @pytest.mark.parametrize("xml, result", [
     ("<if><condition>(<expr><name></name></expr>)</condition></if>", True),
@@ -134,35 +136,90 @@ def test_contain_operator_name(xml, result):
     ("<if><conditions>(<expr><name></name></expr>)</conditions></if>", False)])
 def test_contain_name(xml, result):
     s = SrcmlFilters(xml, True)
-    res=s.contain_name()
-    if res==result:
+    res = s.contain_name()
+    if res == result:
         assert True
         return
 
     assert False
 
+
 @pytest.mark.parametrize("xml, result", [
     ("<if><condition>(<expr><name></name><operator></operator><literal></literal></expr>)</condition></if>", True),
-    ("<if><condition>(<expr><name>test</name><operator></operator><literal>10</literal></expr>)</condition></if><block><test>aa</test></block>", True),
+    (
+    "<if><condition>(<expr><name>test</name><operator></operator><literal>10</literal></expr>)</condition></if><block><test>aa</test></block>",
+    True),
     ("<if><condition>(<expr><literal></literal><operator></operator><name>ciao</name></expr>)</condition></if>", True),
     ("<if><condition>(<expr><literal></name><operator></operator><name></literal></expr>)</condition></if>", False),
     ("<if><condition>(<expr><name></name><operator></operator><name></name></expr>)</condition></if>", False)])
 def test_contain_operator_name_literal(xml, result):
     s = SrcmlFilters(xml, True)
-    res=s.contain_operator_name_literal()
-    if res==result:
+    res = s.contain_operator_name_literal()
+    if res == result:
         assert True
         return
 
     assert False
 
-def test_contain_operator_name_name():
+
+@pytest.mark.parametrize("xml, result", [
+    ("<if><condition>(<expr><name></name><operator></operator><name></name></expr>)</condition></if>", True),
+    (
+    "<if><condition>(<expr><name>value</name><operator>==</operator><name>value2</name></expr>)</condition></if><block><test>aa</test></block>",
+    True),
+    ("<if><condition>(<expr><literal></literal><operator></operator><name></name></expr>)</condition></if>", False),
+    ("<if><condition>(<expr><name></name><operator></operator><name></name></expr><expr></expr>)</condition></if>",
+     False),
+    ("<if><condition>(<expr><name></name><operator></operator><name2></name2></expr>)</condition></if>", False)])
+def test_contain_operator_name_name(xml, result):
+    s = SrcmlFilters(xml, True)
+    res = s.contain_operator_name_name()
+    if res == result:
+        assert True
+        return
+
     assert False
 
 
-def test_contain_equal():
-    assert False
+@pytest.mark.parametrize("xml, result", [
+            (
+            "<if><condition>(<expr><operator></operator><call><name><name></name><operator>.</operator><name>equal</name></name><argument_list>(<argument><expr><name></name></expr></argument>)</argument_list></call><operator></operator><literal></literal></expr>)</condition></if>",
+            True),
+    (
+            "<if><condition>(<expr><call><name><name></name><operator>.</operator><name>equal</name></name><argument_list>(<argument><expr><name></name></expr></argument>)</argument_list></call><operator></operator><name></name></expr>)</condition></if>",
+            True),
+    (
+            "<if><condition>(<expr><call><name><name></name><operator>.</operator><name>equals</name></name><argument_list>(<argument><expr><name></name></expr></argument>)</argument_list></call><operator></operator><name></name></expr>)</condition></if>",
+            False),
+    (
+            "<if><condition>(<expr><call><name>test<name></name><operator>.</operator><name>equal </name></name><argument_list>(<argument><expr><name></name></expr></argument>)</argument_list></call><operator></operator><name></name></expr>)</condition></if>",
+            True),
 
+
+
+
+    (
+            "<if><condition>(<expr><operator></operator><call><name><name></name><operator>.</operator><name>equal</name></name><argument_list>(<argument><expr><name></name></expr></argument>)</argument_list></call></expr>)</condition></if>",
+            True),
+    (
+            "<if><condition>(<expr><call><name><name></name><operator>.</operator><name>equal</name></name><argument_list>(<argument><expr><name></name></expr></argument>)</argument_list></call></expr>)</condition></if>",
+            True),
+    (
+            "<if><condition>(<expr><call><name><name></name><operator>.</operator><name>equals</name></name><argument_list>(<argument><expr><name></name></expr></argument>)</argument_list></call></expr>)</condition></if>",
+            False),
+    (
+            "<if><condition>(<expr><call><name>test<name></name><operator>.</operator><name>equal </name></name><argument_list>(<argument><expr><name></name></expr></argument>)</argument_list></call></expr>)</condition></if>",
+            True),
+
+    ])
+def test_contain_equal(xml, result):
+    s = SrcmlFilters(xml, True)
+    res = s.contain_equal()
+    if res == result:
+        assert True
+        return
+
+    assert False
 
 def test_apply_all_filters():
     assert False
