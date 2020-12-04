@@ -1,13 +1,14 @@
 from bs4 import BeautifulSoup
 
 from anytree import Node, RenderTree
-from anytree.exporter import JsonExporter
 
 import enum
 
 from utils.logger import Logger
 
-# Using enum class create enumerations
+'''
+We use this class to parametrize all the parameters in the code
+'''
 class Fields(enum.Enum):
     NAME = "name"
     TEXT = "text"
@@ -20,6 +21,9 @@ class Fields(enum.Enum):
 
 
 class KeyValueNode():
+    '''
+    This class is a single node in the tree. It is made up by the @key (the tag in the xml) and the @value (the text field, "" if missing)
+    '''
     def __init__(self, key, value):
         self.key = key
         self.value = value
@@ -30,12 +34,21 @@ class KeyValueNode():
 
 class SrcmlFilters():
     def __init__(self, xml_code, is_string=False):
-
+        '''
+        This is the initializer of the SrcmlFilters class. You can call che init function in two different ways:
+        1. if you have already created the bs4 xml function, you can pass it to the init with @is_string = False
+        2. if you want to pass a string that have to be converted to the bs4 object, you can pass the @xml_code as a string,
+        with the paramter @is_string = True
+        '''
         xml_code_curr = xml_code
 
         if is_string:  # this is a bs4 object created by scrml_parser
             xml_code_curr = BeautifulSoup(xml_code, 'lxml')
-
+            '''
+            By default bs4 creates an html and body tag if you don't pass the full xml
+            In this way we're looking for the body tag to extract the first (an only) child that
+            is the tag we're interested in
+            '''
             xml_code_curr = xml_code_curr.select('body')[0]
             child = self.get_list_of_children(xml_code_curr)[0]
             xml_code_curr = xml_code_curr.select(child)[0]
@@ -47,54 +60,73 @@ class SrcmlFilters():
         self.log = self.log_class.log
 
         try:
+            '''
+            We create the tree
+            '''
+            text = xml_code_curr.text if hasattr(xml_code_curr, Fields.TEXT.value) else ""
 
-            text = ""
-            if hasattr(xml_code_curr, Fields.TEXT.value):
-                text = xml_code_curr.text
-
-            parent = Node(KeyValueNode(xml_code_curr.name, xml_code_curr.text))
+            parent = Node(KeyValueNode(xml_code_curr.name, text))
             self.add_children_to_node_with_text(parent, xml_code_curr, skip=[None, "block"])
             self.tree = parent
         except Exception as e:
             print("ERROR CREATION TREE")
 
+
     def get_list_of_children(self, parent, skip=Fields.SKIP.value):
+        '''
+        This function is not used anymore. It allows you to get the list of the children (only name field) of the node @parent
+        We use the @skip attribute the exclude from the result specific value we're not interested in
+        '''
         children = list()
         try:
             for child in parent.children:
-                if hasattr(child, Fields.NAME.value) and child.name is not None:
-                    children.append(child.name)
+                if hasattr(child, Fields.NAME.value) and getattr(child, Fields.NAME.value) is not None:
+                    children.append(getattr(child, Fields.NAME.value))
             return [c for c in children if c not in skip]
         except Exception as e:
             return list()
 
+
     def get_list_of_children_with_text(self, parent, skip=Fields.SKIP.value):
+        '''
+        This function allows you to extract the list of the children of the node @parent (a bs4 object)
+        We use the @skip attribute the exclude from the result specific value we're not interested in
+        '''
         children = list()
         try:
             for child in parent.children:
-                if hasattr(child, Fields.NAME.value) and child.name is not None:  # check if child["name"]
-                    if hasattr(child, Fields.TEXT.value) and child.text is not None:
-                        text = child.text
-                        node = KeyValueNode(child.name, text)
+                if hasattr(child, Fields.NAME.value) and getattr(child, Fields.NAME.value) is not None:
+                    if hasattr(child, Fields.TEXT.value) and getattr(child, Fields.TEXT.value) is not None:
+                        text = getattr(child, Fields.TEXT.value)
+                        node = KeyValueNode(getattr(child, Fields.NAME.value), text)
                     else:
-                        node = KeyValueNode(child.name, "")
+                        node = KeyValueNode(getattr(child, Fields.NAME.value), "")
                     children.append(node)
             return [c for c in children if c.key not in skip]
         except Exception as e:
             return list()
 
     def get_list_of_children_with_text_from_tree(self, parent, skip=Fields.SKIP.value):
+        '''
+        This function allows you to extract the list of the children of the node @parent (a tree node)
+        We use the @skip attribute the exclude from the result specific value we're not interested in
+        '''
         children = list()
         try:
             for child in parent.children:
-                if hasattr(child, Fields.NAME.value) and child.name is not None:
-                    node = child.name
+                if hasattr(child, Fields.NAME.value) and getattr(child, Fields.NAME.value) is not None:
+                    node = getattr(child, Fields.NAME.value)
                     children.append(node)
             return [c for c in children if c.key not in skip]
         except Exception as e:
             return list()
 
     def add_children_to_node(self, parent, xml, skip):
+        '''
+        This function is not used anymore. It allows you to add the children of @xml node (bs4 object) to the node @parent.
+        We're considering only the attribute @name
+        We use the @skip attribute the exclude from the result specific value we're not interested in
+        '''
         children = self.get_list_of_children(xml, skip)
         for child in children:
             c = Node(child, parent=parent)
@@ -104,6 +136,11 @@ class SrcmlFilters():
                     self.add_children_to_node(c, c2, skip)
 
     def add_children_to_node_with_text(self, parent, xml, skip):
+        '''
+        This function allows you to add the children of @xml node (bs4 object) to the node @parent.
+        Every node is made up by a key (the tag) and value (the text)
+        We use the @skip attribute the exclude from the result specific value we're not interested in
+        '''
         children = self.get_list_of_children_with_text(xml, skip)
         for child in children:
             c = Node(child, parent=parent)
@@ -114,12 +151,20 @@ class SrcmlFilters():
                     self.add_children_to_node_with_text(c, c2, skip)
 
     def print_tree(self):
+        '''
+        This functin allows you to print the tree
+        '''
         if self.tree == None:
-            print("Please load the tree")
+            self.log.info("Please load the tree")
         for pre, fill, node in RenderTree(self.tree):
-            print("%s%s" % (pre, node.name))
+            self.log.info("%s%s" % (pre, node.name))
 
     def check_condition(self, conditions):
+        '''
+        Given a list of @conditions (a list of strings) this function converts each of them in a SrcmlFilters instance
+        and check if the @self.tree has the same structure of at least one of them
+        To see further details about how we do the comparison, chdck the function @check_if_tree_are_equal
+        '''
         for condition in conditions:
             comparison_tree = SrcmlFilters(condition, True)
             # comparison_tree.print_tree()
@@ -133,32 +178,55 @@ class SrcmlFilters():
         return False
 
     def contain_operator_name(self):
+        '''
+        This function check if the current condition has the same form of the following sentence (the operator in the sentences
+        is an example, we don't care about the operator itself)
+        if(!variable_name)
+        '''
 
-        # if (!name)
         conditions = ["<if><condition>(<expr><operator></operator><name></name></expr>)</condition></if>"]
         return self.check_condition(conditions)
 
     def contain_name(self):
+        '''
+        This function check if the current condition has the same form of the following sentence
+        if(variable_name)
+        '''
 
-        # if (name)
         conditions = ["<if><condition>(<expr><name></name></expr>)</condition></if>"]
         return self.check_condition(conditions)
 
     def contain_operator_name_literal(self):
-        # if ( name != 10)
+        '''
+        This function check if the current condition has the same form of the following sentences (the operator in the sentences
+        is an example, we don't care about the operator itself)
+        if(variable_name>10)
+        if(variable_name==null)
+        if(null==variable_name)
+        '''
         conditions = [
             "<if><condition>(<expr><name></name><operator></operator><literal></literal></expr>)</condition></if>",
             "<if><condition>(<expr><literal></literal><operator></operator><name></name></expr>)</condition></if>"]
         return self.check_condition(conditions)
 
     def contain_operator_name_name(self):
-
-        # if ( name != name2 )
+        '''
+        This function check if the current condition has the same form of the following sentence (the operator in the sentences
+        is an example, we don't care about the operator itself)
+        if(variable_name==variable_name)
+        '''
         conditions = ["<if><condition>(<expr><name></name><operator></operator><name></name></expr>)</condition></if>"]
         return self.check_condition(conditions)
 
     def contain_equal(self):
-
+        '''
+        This function check if the current condition has the same form of the following sentences (the operator in the sentences
+        is an example, we don't care about the operator itself)
+        if(variable_name.equal(variable_name))
+        if(variable_name.equal(variable_name)==True)
+        if(!variable_name.equal(variable_name))
+        if(!variable_name.equal(variable_name)==True)
+        '''
         conditions = [
             "<if><condition>(<expr><operator></operator><call><name><name_literal></name_literal><operator>.</operator><name>equal</name></name><argument_list>(<argument><expr><name_literal></name_literal></expr></argument>)</argument_list></call><operator></operator><name_literal></name_literal></expr>)</condition></if>",
             "<if><condition>(<expr><call><name><name_literal></name_literal><operator>.</operator><name>equal</name></name><argument_list>(<argument><expr><name_literal></name_literal></expr></argument>)</argument_list></call><operator></operator><name_literal></name_literal></expr>)</condition></if>",
@@ -168,6 +236,10 @@ class SrcmlFilters():
         return self.check_condition(conditions)
 
     def apply_all_filters(self):
+        '''
+        This function applies all filters to check if @self.tree is equal to one of them
+        it returns True if this happens, False otherwise
+        '''
         if self.contain_name():
             print("CONTAIN_NAME")
             return True
@@ -192,7 +264,13 @@ class SrcmlFilters():
 
 
 def equal_value(node_target, node2):
-    if node_target.name.value == "":
+    '''
+    This function checks if the @value field of @node_target and @node2 are the same
+    If we set the text of the variable in the @node_target (e.g. <name>equal</name>)
+    we want to check that this name has to be the same in the @node2 value
+    If the value of the @node_target is not present, we don't care about the @node2 value
+    '''
+    if node_target.name.value.strip() == "":
         return True
 
     if node_target.name.value.strip() == node2.name.value.strip():
@@ -202,6 +280,9 @@ def equal_value(node_target, node2):
 
 
 def equal_key(node_target, node2):
+    '''
+    This function check if the @key of @node_target and @node2 is the same
+    '''
     if node_target.name.key in Fields.SPECIAL_TAG.value:
         allowed_tags = Fields.__getitem__(node_target.name.key).value
         if node2.name.key in allowed_tags:
@@ -212,6 +293,18 @@ def equal_key(node_target, node2):
 
 
 def check_if_tree_are_equal(tree1, tree2, skip):
+    '''
+    This function checks if the two tree are equal (see @equal_key and @equal_value to see further information about
+    what we mean with "equal"
+    This is a recursive function so when we refer to "tree" it can be applied to all subtrees of a specific tree
+    First of all we extract the list of the child for the two trees (se always exclude the value present in @skip)
+    If the length of the child is not the same the trees are not equal
+    If both the tree have no children we check if they have the same key and value
+    Otherwise, for all the children of both node,
+    we check if key and value are the same for each node,
+    and if the subtrees are the same
+    The function returns True if the trees are equal, False otherwise
+    '''
     child_1 = [t for t in tree1.children if t.name.key not in skip]
     child_2 = [t for t in tree2.children if t.name.key not in skip]
 

@@ -18,24 +18,39 @@ class SrcmlParser():
         This function use the select operator defined by beautifulsoup to return the list of all tag @tag
         inside the node @node
         We can choose every node
+        e.g. extract_all_tags("if", self.soup)
         '''
 
         tags = node.select(tag)
         return tags
 
     def extract_methods(self):
+        '''
+        This function uses the @extract_all_tags method to extract all methods contained in the xml file
+        '''
         self.methods = self.extract_all_tags("function", self.soup)
 
     def check_contain_tag(self, tag, node):
+        '''
+        This function uses the @extract_all_tags method to check if there are some tag @tag inside the node
+        '''
         res = self.extract_all_tags(tag, node)
         if len(res) > 0:
             return True
         return False
 
     def check_contain_if(self, node):
+        '''
+        This function checks if there are some if tag in the node @node
+        '''
         self.contain_if = self.check_contain_tag("if", node)
 
     def apply_filters_if(self):
+        '''
+        This is the main function. It takes the list of methods and for each method it extracts all the "if" conditions
+        Then, for each if condition, it applies the @SrcmlFilters.apply_all_filters function to check if that condition is
+        belonging to one of the classes we're searching
+        '''
         methods=self.methods
         for m in methods:
             if_conditions=self.extract_all_tags("if", m)
