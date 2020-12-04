@@ -220,6 +220,3 @@ def test_contain_equal(xml, result):
         return
 
     assert False
-
-def test_apply_all_filters():
-    assert False
