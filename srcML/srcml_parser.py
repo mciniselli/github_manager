@@ -15,17 +15,14 @@ class SrcmlParser():
     def extract_methods(self):
         self.methods = self.extract_all_tags("function", self.soup)
 
-    def contain_tag(self, tag, node):
+    def check_contain_tag(self, tag, node):
         res = self.extract_all_tags(tag, node)
         if len(res) > 0:
             return True
         return False
 
     def check_contain_if(self, node):
-        if self.check_contain_tag("if", node):
-            self.contain_if = True
-            return
-        self.contain_if = False
+        self.contain_if = self.check_contain_tag("if", node)
 
     def apply_filters_if(self):
         methods=self.methods

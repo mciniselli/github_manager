@@ -43,24 +43,33 @@ def test_extract_methods(file, result):
                                                ("test_folder/srcml/srcml_parser/file_1.xml", "namee", False),
                                                ("test_folder/srcml/srcml_parser/file_1.xmll", "if", False),
                                                ("test_folder/srcml/srcml_parser/file_1.xml", "operator", True)])
-def test_contain_tag(file, tag, result):
+def test_check_contain_tag(file, tag, result):
     m = SrcmlManager()
     xml_code = m.read_file(file)
 
     xml_code = "\n".join(xml_code)
     p = SrcmlParser(xml_code)
 
-    res=p.contain_tag(tag, p.soup)
+    res= p.check_contain_tag(tag, p.soup)
     if res == result:
         assert True
         return
 
     assert False
 
+@pytest.mark.parametrize("file, result", [("test_folder/srcml/srcml_parser/file_1.xml", True),
+                                               ("test_folder/srcml/srcml_parser/file_1.xmll", False),
+                                               ("test_folder/srcml/srcml_parser/file_no_if.xml", False)])
+def test_check_contain_if(file, result):
 
-def test_check_contain_if():
-    assert False
+    m = SrcmlManager()
+    xml_code = m.read_file(file)
 
+    xml_code = "\n".join(xml_code)
+    p = SrcmlParser(xml_code)
+    p.check_contain_if(p.soup)
+    if p.contain_if == result:
+        assert True
+        return
 
-def test_apply_filters_if():
     assert False

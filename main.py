@@ -329,7 +329,7 @@ def test_srcml_parser():
     from srcML.srcml_manager import SrcmlManager
     from srcML.srcml_filters import SrcmlFilters
     m=SrcmlManager()
-    m.process_with_srcml("test/test_folder/srcml_manager/file_1.java")
+    m.process_with_srcml("test/test_folder/srcml/srcml_manager/file_1.java")
     xml=m.get_xml()
 
     s=SrcmlParser(xml)

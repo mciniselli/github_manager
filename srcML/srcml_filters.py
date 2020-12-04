@@ -1,22 +1,8 @@
-import sys
-import collections
-import bs4
-import re
-import json
 
 from bs4 import BeautifulSoup
 
 from anytree import Node, RenderTree
 from anytree.exporter import JsonExporter
-
-# usare enumerate o simile come chiave valore  if -> enum.if
-
-
-# NAME = "name"
-# TEXT = "text"
-# IF = "if"
-# BLOCK = "block"
-# SKIP = [None, BLOCK]
 
 import enum
 # Using enum class create enumerations
@@ -39,7 +25,6 @@ class KeyValueNode():
     def __str__(self):
         return "{} {}".format(self.key, self.value)
 
-
 class SrcmlFilters():
     def __init__(self, xml_code, is_string=False):
 
@@ -47,13 +32,21 @@ class SrcmlFilters():
 
         if is_string:  # this is a bs4 object created by scrml_parser
             xml_code_curr = BeautifulSoup(xml_code, 'lxml')
-            xml_code_curr = xml_code_curr.select('if')[0]
 
-        self.xml_code = xml_code
+            xml_code_curr = xml_code_curr.select('body')[0]
+            child=self.get_list_of_children(xml_code_curr)[0]
+            xml_code_curr = xml_code_curr.select(child)[0]
+
+        self.xml_code = xml_code_curr
         self.tree = None
 
         try:
-            parent = Node(xml_code_curr.name)
+
+            text=""
+            if hasattr(xml_code_curr, Fields.TEXT.value):
+                text=xml_code_curr.text
+
+            parent = Node( KeyValueNode(xml_code_curr.name, xml_code_curr.text))
             self.add_children_to_node_with_text(parent, xml_code_curr, skip=[None, "block"])
             self.tree = parent
         except Exception as e:
@@ -77,7 +70,20 @@ class SrcmlFilters():
                     if hasattr(child, Fields.TEXT.value) and child.text is not None:
                         text = child.text
                         node = KeyValueNode(child.name, text)
-                    children.append(node)  # change in tuple using a object
+                    else:
+                        node = KeyValueNode(child.name, "")
+                    children.append(node)
+            return [c for c in children if c.key not in skip]
+        except Exception as e:
+            return list()
+
+    def get_list_of_children_with_text_from_tree(self, parent, skip=Fields.SKIP.value):
+        children = list()
+        try:
+            for child in parent.children:
+                if hasattr(child, Fields.NAME.value) and child.name is not None:
+                    node=child.name
+                    children.append(node)
             return [c for c in children if c.key not in skip]
         except Exception as e:
             return list()
