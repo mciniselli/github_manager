@@ -1,4 +1,5 @@
 import logging
+import os
 
 class Logger:
 
@@ -6,13 +7,15 @@ class Logger:
     fh=None
     formatter=None
 
-    def __init__(self):
+    def __init__(self, name="logger.log"):
         self.log = logging.getLogger('LOGGER')
-        self.fh = logging.FileHandler('logger.log')
+        self.fh = logging.FileHandler(os.path.join(os.getcwd(), name))
         self.formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        self.set_level()
 
     def set_level(self, level=logging.DEBUG):
         self.log.setLevel(level)
         self.fh.setLevel(level)
         self.fh.setFormatter(self.formatter)
-        self.log.addHandler(self.fh)
+        if len(self.log.handlers)==0:
+            self.log.addHandler(self.fh)

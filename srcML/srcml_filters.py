@@ -69,13 +69,18 @@ class SrcmlFilters():
             self.add_children_to_node_with_text(parent, xml_code_curr, skip=[None, "block"])
             self.tree = parent
         except Exception as e:
-            print("ERROR CREATION TREE")
+            self.log.error("ERROR CREATION TREE")
 
 
     def get_list_of_children(self, parent, skip=Fields.SKIP.value):
         '''
         This function is not used anymore. It allows you to get the list of the children (only name field) of the node @parent
         We use the @skip attribute the exclude from the result specific value we're not interested in
+        e.g.
+        xml_code = "<xml><function><if>if <condition>(<expr><name>var</name></expr>)</condition></if></function></xml>"
+        filters = SrcmlFilters(xml_code, True)
+        children=filters.get_list_of_children(filters.xml_code)
+        print(len(children))
         '''
         children = list()
         try:
@@ -91,6 +96,11 @@ class SrcmlFilters():
         '''
         This function allows you to extract the list of the children of the node @parent (a bs4 object)
         We use the @skip attribute the exclude from the result specific value we're not interested in
+        e.g.
+        xml_code = "<xml><function><if>if <condition>(<expr><name>var</name></expr>)</condition></if></function></xml>"
+        filters = SrcmlFilters(xml_code, True)
+        children=filters.get_list_of_children_with_text(filters.xml_code)
+        print(len(children))
         '''
         children = list()
         try:
@@ -110,6 +120,11 @@ class SrcmlFilters():
         '''
         This function allows you to extract the list of the children of the node @parent (a tree node)
         We use the @skip attribute the exclude from the result specific value we're not interested in
+        e.g.
+        xml_code = "<xml><function><if>if <condition>(<expr><name>var</name></expr>)</condition></if></function></xml>"
+        filters = SrcmlFilters(xml_code, True)
+        children=filters.get_list_of_children_with_text_from_tree(filters.tree)
+        print((children[0]))
         '''
         children = list()
         try:
@@ -140,6 +155,25 @@ class SrcmlFilters():
         This function allows you to add the children of @xml node (bs4 object) to the node @parent.
         Every node is made up by a key (the tag) and value (the text)
         We use the @skip attribute the exclude from the result specific value we're not interested in
+        e.g. in this case we're adding to the children of <xml> all the children of <fake>
+        You can use it for merging trees.
+        The result is the following
+        xml hello
+        ├── hello hello
+        └── function if (var)
+            └── if if (var)
+                └── condition (var)
+                    └── expr var
+                        └── name var
+        xml_code = "<xml><hello>hello</hello></xml>"
+        xml_code2 = "<fake><function><if>if <condition>(<expr><name>var</name></expr>)</condition></if></function></fake>"
+
+        filters = SrcmlFilters(xml_code, True)
+
+        filters2 = SrcmlFilters(xml_code2, True)
+
+        filters.add_children_to_node_with_text(filters.tree, filters2.tree, [None, "block"])
+        filters.print_tree()
         '''
         children = self.get_list_of_children_with_text(xml, skip)
         for child in children:
@@ -152,18 +186,30 @@ class SrcmlFilters():
 
     def print_tree(self):
         '''
-        This functin allows you to print the tree
+        This function allows you to print the tree
+        e.g.
+        xml_code = "<xml><hello>hello</hello></xml>"
+        filters = SrcmlFilters(xml_code, True)
+        filters.print_tree()
         '''
         if self.tree == None:
             self.log.info("Please load the tree")
         for pre, fill, node in RenderTree(self.tree):
             self.log.info("%s%s" % (pre, node.name))
+        #     print("%s%s" % (pre, node.name))
+        # print("-----------")
+        self.log.info("--------------")
 
     def check_condition(self, conditions):
         '''
         Given a list of @conditions (a list of strings) this function converts each of them in a SrcmlFilters instance
         and check if the @self.tree has the same structure of at least one of them
         To see further details about how we do the comparison, chdck the function @check_if_tree_are_equal
+        e.g.
+        xml_code = "<xml><function><if>if <condition>(<expr><name>var</name></expr>)</condition></if></function></xml>"
+        filters = SrcmlFilters(xml_code, True)
+        conditions = ["<if><condition>(<expr><operator></operator><name></name></expr>)</condition></if>"]
+        filters.check_condition(conditions)
         '''
         for condition in conditions:
             comparison_tree = SrcmlFilters(condition, True)
@@ -239,6 +285,10 @@ class SrcmlFilters():
         '''
         This function applies all filters to check if @self.tree is equal to one of them
         it returns True if this happens, False otherwise
+        e.g.
+        xml_code = "<xml><function><if>if <condition>(<expr><name>var</name></expr>)</condition></if></function></xml>"
+        filters = SrcmlFilters(xml_code, True)
+        filters.apply_all_filters()
         '''
         if self.contain_name():
             print("CONTAIN_NAME")

@@ -133,7 +133,8 @@ def test_contain_operator_name(xml, result):
     ("<if><condition>(<expr><name>variable</name></expr>)</condition></if>", True),
     ("<if><condition>(<expr><name></name></expr>)</condition></if><block><test>aa</test></block>", True),
     ("<if><condition>(<expr><name></name><name></name></expr>)</condition></if>", False),
-    ("<if><conditions>(<expr><name></name></expr>)</conditions></if>", False)])
+    ("<if><conditions>(<expr><name></name></expr>)</conditions></if>", False),
+    ("<if><condition>(<expr><name></name><operator></operator><operator></operator><name></name></expr>)</condition></if>", False)])
 def test_contain_name(xml, result):
     s = SrcmlFilters(xml, True)
     res = s.contain_name()

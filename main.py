@@ -383,9 +383,24 @@ def test_equal():
     res = s.contain_equal()
     print(res)
 
+def test():
+    from srcML.srcml_filters import SrcmlFilters
+    xml_code = "<xml><hello>hello</hello></xml>"
+    xml_code2 = "<fake><function><if>if <condition>(<expr><name>var</name></expr>)</condition></if></function></fake>"
+
+    filters = SrcmlFilters(xml_code, True)
+    filters.print_tree()
+
+    filters2 = SrcmlFilters(xml_code2, True)
+    filters2.print_tree()
+
+    filters.add_children_to_node_with_text(filters.tree, filters2.tree, [None, "block"])
+    filters.print_tree()
+
 if __name__=="__main__":
     # main()
     # test_srcml_parser()
     # test_tree()
     # test_merge_tree()
-    test_equal()
+    # test_equal()
+    test()

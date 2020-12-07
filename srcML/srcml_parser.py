@@ -19,6 +19,11 @@ class SrcmlParser():
         inside the node @node
         We can choose every node
         e.g. extract_all_tags("if", self.soup)
+        e.g.
+        xml_code="<xml><function><if>if <condition>(<expr><name>var</name></expr>)</condition></if></function></xml>"
+        parser=SrcmlParser(xml_code)
+        tags=parser.extract_all_tags("if", parser.soup)
+        print(len(tags))
         '''
 
         tags = node.select(tag)
@@ -27,12 +32,22 @@ class SrcmlParser():
     def extract_methods(self):
         '''
         This function uses the @extract_all_tags method to extract all methods contained in the xml file
+        e.g.
+        xml_code = "<xml><function><if>if <condition>(<expr><name>var</name></expr>)</condition></if></function></xml>"
+        parser = SrcmlParser(xml_code)
+        parser.extract_methods()
+        print(len(parser.methods))
         '''
         self.methods = self.extract_all_tags("function", self.soup)
 
     def check_contain_tag(self, tag, node):
         '''
         This function uses the @extract_all_tags method to check if there are some tag @tag inside the node
+        e.g.
+        xml_code = "<xml><function><if>if <condition>(<expr><name>var</name></expr>)</condition></if></function></xml>"
+        parser = SrcmlParser(xml_code)
+        result=parser.check_contain_tag("condition", parser.soup)
+        print(result)
         '''
         res = self.extract_all_tags(tag, node)
         if len(res) > 0:
@@ -42,6 +57,11 @@ class SrcmlParser():
     def check_contain_if(self, node):
         '''
         This function checks if there are some if tag in the node @node
+        e.g.
+        xml_code = "<xml><function><if>if <condition>(<expr><name>var</name></expr>)</condition></if></function></xml>"
+        parser = SrcmlParser(xml_code)
+        parser.check_contain_if(parser.soup)
+        print(parser.contain_if)
         '''
         self.contain_if = self.check_contain_tag("if", node)
 
@@ -50,6 +70,11 @@ class SrcmlParser():
         This is the main function. It takes the list of methods and for each method it extracts all the "if" conditions
         Then, for each if condition, it applies the @SrcmlFilters.apply_all_filters function to check if that condition is
         belonging to one of the classes we're searching
+        e.g.
+        xml_code = "<xml><function><if>if <condition>(<expr><name>var</name></expr>)</condition></if></function></xml>"
+        parser = SrcmlParser(xml_code)
+        parser.extract_methods()
+        parser.apply_filters_if()
         '''
         methods=self.methods
         for m in methods:
