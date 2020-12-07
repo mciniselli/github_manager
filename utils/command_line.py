@@ -14,7 +14,7 @@ class CommandLineHelper():
         self.log=self.log_class.log
 
 
-    def exec(self, cmd, cwd):
+    def exec(self, cmd, cwd, timeout=60):
         '''
         This function execute the command @cmd using @cwd as working directory
         Then save the output in @self.output and the error in @self.error
@@ -25,10 +25,11 @@ class CommandLineHelper():
         self.log.info("run command {}".format(cmd))
 
         try:
-            output, error = p.communicate(timeout=60)
+            output, error = p.communicate(timeout=timeout)
         except TimeoutExpired:
             p.kill()
-            output, error = p.communicate()
+            # output, error = p.communicate()
+            return "", "TimeoutExpired"
 
         output = output.decode()
         error = error.decode()

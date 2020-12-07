@@ -1,7 +1,8 @@
 from utils.command_line import CommandLineHelper
 
 from utils.github_helper import GithubHelper
-
+import json
+import os
 from srcML.srcml_filters import SrcmlFilters, KeyValueNode, Fields
 
 class Operation():
@@ -397,10 +398,39 @@ def test():
     filters.add_children_to_node_with_text(filters.tree, filters2.tree, [None, "block"])
     filters.print_tree()
 
+def process_json_file():
+    json_file = "json_data/results.json"
+    file_data = read_file(json_file)
+    data = json.loads(file_data[0])
+    items = (data["items"])
+    print(len(items))
+
+    file_name="results.json"
+
+    from repoManager.repo import Repo
+
+    for i, item in enumerate(items):
+
+        print("Processed {} repositories of out {}".format(i, len(items)))
+        repo_name = item["name"]
+        repo_commit = item["lastCommitSHA"]
+        repo_url = "https://github.com/{}".format(repo_name)
+        print(repo_url)
+        r = Repo(repo_name, repo_url, repo_commit)
+        # r.clone_repo("cloning_folder")
+        r.create_java_files()
+
+
+
+        break
+
+
+
 if __name__=="__main__":
     # main()
     # test_srcml_parser()
     # test_tree()
     # test_merge_tree()
     # test_equal()
-    test()
+    # test()
+    process_json_file()

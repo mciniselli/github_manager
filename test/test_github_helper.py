@@ -92,8 +92,8 @@ def test_get_list_of_branches(cwd, result):
     assert False
 
 
-@pytest.mark.parametrize("repo, cwd", [("mciniselli/test_branch", "test_folder/github_helper/check_tags_branch"),
-                                                  ("mciniselli/test", "test_folder/github_helper/check_tags_branch")])
+@pytest.mark.parametrize("repo, cwd", [("mciniselli/test_branch", "test_folder/github_helper/check_tags_branch/TBD"),
+                                                  ("mciniselli/test", "test_folder/github_helper/check_tags_branch/TBD")])
 def test_checkout(repo, cwd):
     g=GithubHelper()
     g.clone(repo, cwd)

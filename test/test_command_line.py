@@ -1,12 +1,11 @@
 from utils.command_line import CommandLineHelper
 import pytest
 import os
-from utils.logger import init_logger
 
-@pytest.fixture(scope="session", autouse=True)
-def init():
-    # prepare something ahead of all tests
-    init_logger()
+# @pytest.fixture(scope="session", autouse=True)
+# def init():
+#     # prepare something ahead of all tests
+#     init_logger()
 
 @pytest.mark.parametrize("command, cwd, result", [("ls", "test_folder/command_line", 3),
                                                   ("cat A.txt", "test_folder/command_line", 1)])

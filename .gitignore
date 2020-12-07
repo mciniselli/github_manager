@@ -79,6 +79,7 @@ mysql
 venv
 .idea
 preliminary_test
+cloning_folder
 
 # Specific file extension if root folder
 *.txt

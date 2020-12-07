@@ -26,6 +26,9 @@ class GithubHelper():
         c = CommandLineHelper()
         out, err = c.exec(cmd, directory)
 
+        if err == "TimeoutExpired":
+            return False
+
         if c.is_command_ok():
             return True
 
@@ -90,7 +93,7 @@ class GithubHelper():
         self.cmd = cmd
         c = CommandLineHelper()
         out, err = c.exec(cmd, directory)
-
+        print(out)
         return out, c.is_command_ok()
 
     def get_list_of_branches(self, directory):
@@ -108,6 +111,10 @@ class GithubHelper():
         Given a directory, this function make the checkout to the last release (it can be the tag or the branch)
         '''
         version, is_tag = self.get_last_release(directory)
+        self.version=version
+        self.is_tag=is_tag
+        if version==-1:
+            return False
 
         cmd = ""
         if is_tag:
@@ -120,3 +127,5 @@ class GithubHelper():
 
         c = CommandLineHelper()
         out, err = c.exec(cmd, directory)
+
+        return True
