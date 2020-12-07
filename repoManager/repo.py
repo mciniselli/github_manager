@@ -34,13 +34,16 @@ class Repo:
         self.cloned_directory="cloning_folder/packages_apps_Trebuchet"
 
         files=self.getListOfFiles(self.cloned_directory)
-        java_files=[f for f in files if f.endswith(".java")]
+        java_files=[os.path.join(os.getcwd(), f) for f in files if f.endswith(".java")]
         files=list()
         for f in java_files:
             file=File(f)
             files.append(file)
 
         self.files=files
+
+        print(self.files[0].filename)
+        self.files[0].extract_methods()
 
 
     def getListOfFiles(self, dirName):

@@ -424,7 +424,16 @@ def process_json_file():
 
         break
 
+def test_remove():
+    from srcML.srcml_filters import SrcmlFilters
+    xml_code2 = "<fake><function><if>if <condition>(<expr><name>var</name></expr>)</condition></if></function></fake>"
 
+
+    filters2 = SrcmlFilters(xml_code2, True)
+    filters2.print_tree()
+
+    filters2.xml_code=filters2.xml_code.select("condition")[0].decompose()
+    filters2.print_tree()
 
 if __name__=="__main__":
     # main()
@@ -433,4 +442,5 @@ if __name__=="__main__":
     # test_merge_tree()
     # test_equal()
     # test()
-    process_json_file()
+    # process_json_file()
+    test_remove()
