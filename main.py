@@ -418,7 +418,7 @@ def process_json_file():
         print(repo_url)
         r = Repo(repo_name, repo_url, repo_commit)
         # r.clone_repo("cloning_folder")
-        r.create_java_files()
+        r.add_files()
 
 
 
@@ -426,14 +426,47 @@ def process_json_file():
 
 def test_remove():
     from srcML.srcml_filters import SrcmlFilters
-    xml_code2 = "<fake><function><if>if <condition>(<expr><name>var</name></expr>)</condition></if></function></fake>"
+    xml_code2 = "<fake><function><if>if <condition>(<expr><name>var</name></expr>)</condition><condition>(<expr><name>var</name></expr>)</condition></if></function></fake>"
+    # xml_code2 = "<fake><function><if>if <condition>(<expr><name>var</name></expr>)</condition></if></function></fake>"
 
 
     filters2 = SrcmlFilters(xml_code2, True)
     filters2.print_tree()
 
-    filters2.xml_code=filters2.xml_code.select("condition")[0].decompose()
+    xml=filters2.xml_code
+    print(xml)
+    a=xml.select("condition")
+
+    old_condition=SrcmlFilters("<condition>(<expr><name>var</name></expr>)</condition>", True)
+
+    # b=xml.select_one(old_condition.xml_code)
+
+    curr=a[0]
+
+    # bb=xml.find(curr)
+    from bs4 import BeautifulSoup
+    aa=BeautifulSoup("<new_condition>aa</new_condition>", "lxml")
+
+    # aaaa=xml.find(BeautifulSoup("<condition>(<expr><name>var</name></expr>)</condition>"))
+
+    # xml.find("condition").replaceWith(aa)
+
+    filter_new=SrcmlFilters("<new_condition>aa</new_condition>", True)
+
+    # xml.find("condition").replaceWith(filter_new.xml_code)
+
+    xml.select_one("condition").name="BB"
+    xml.find("condition").name="BA"
+
+
+    xml.select_one("condition").replaceWith(filter_new.xml_code)
+
+
+    # filters2.xml_code=filters2.xml_code.select("condition")[0].decompose()
     filters2.print_tree()
+
+
+
 
 if __name__=="__main__":
     # main()
@@ -442,5 +475,5 @@ if __name__=="__main__":
     # test_merge_tree()
     # test_equal()
     # test()
-    # process_json_file()
-    test_remove()
+    process_json_file()
+    # test_remove()

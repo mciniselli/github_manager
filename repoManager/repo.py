@@ -29,8 +29,9 @@ class Repo:
             self.is_repo_ok=False
 
 
-    def create_java_files(self):
+    def add_files(self):
 
+        # to be REMOVED
         self.cloned_directory="cloning_folder/packages_apps_Trebuchet"
 
         files=self.getListOfFiles(self.cloned_directory)
@@ -43,7 +44,7 @@ class Repo:
         self.files=files
 
         print(self.files[0].filename)
-        self.files[0].extract_methods()
+        self.files[0].add_methods()
 
 
     def getListOfFiles(self, dirName):

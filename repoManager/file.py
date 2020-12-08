@@ -8,7 +8,9 @@ class File:
         self.filename=filename
         self.methods=None
 
-    def extract_methods(self):
+        self.add_methods()
+
+    def add_methods(self):
         s=SrcmlManager()
         s.process_with_srcml(self.filename)
         xml_code=s.get_xml()
@@ -19,12 +21,19 @@ class File:
         methods=list()
         for m in p.methods:
             meth=Method(m)
+
             methods.append(meth)
 
         self.methods=methods
 
-        method=methods[0]
-        tokens=method.extract_list_of_tokens(method.xml)
-        for t in tokens:
-            print(repr(t))
+        for m in self.methods:
+            m.add_conditions()
+
+        # method=methods[0]
+        # tokens=method.extract_list_of_tokens(method.xml)
+        # for t in tokens:
+        #     print(repr(t))
+        #
+        #
+        # method.add_conditions()
 

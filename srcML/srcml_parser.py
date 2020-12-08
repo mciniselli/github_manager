@@ -18,7 +18,6 @@ class SrcmlParser():
         This function use the select operator defined by beautifulsoup to return the list of all tag @tag
         inside the node @node
         We can choose every node
-        e.g. extract_all_tags("if", self.soup)
         e.g.
         xml_code="<xml><function><if>if <condition>(<expr><name>var</name></expr>)</condition></if></function></xml>"
         parser=SrcmlParser(xml_code)

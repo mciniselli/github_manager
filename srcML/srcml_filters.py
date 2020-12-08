@@ -196,8 +196,8 @@ class SrcmlFilters():
             self.log.info("Please load the tree")
         for pre, fill, node in RenderTree(self.tree):
             self.log.info("%s%s" % (pre, node.name))
-        #     print("%s%s" % (pre, node.name))
-        # print("-----------")
+            print("%s%s" % (pre, node.name))
+        print("-----------")
         self.log.info("--------------")
 
     def check_condition(self, conditions):
