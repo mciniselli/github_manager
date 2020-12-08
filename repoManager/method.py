@@ -1,5 +1,6 @@
 from srcML.srcml_filters import SrcmlFilters
 from srcML.srcml_parser import SrcmlParser
+from repoManager.condition import Condition
 
 import sys
 
@@ -29,13 +30,27 @@ class Method():
 
         if_conditions = parser.extract_all_tags("if", parser.soup)
 
-        print(len(if_conditions))
+        conditions=list()
+
         for if_condition in if_conditions:
-            print(if_condition.text)
-            f = SrcmlFilters(if_condition)
-            f.print_tree()
-            f.apply_all_filters()
-            print("_____________________")
+            conditions.append(Condition(if_condition))
+
+        self.conditions=conditions
+
+
+
+        # print(len(if_conditions))
+        # for if_condition in if_conditions:
+        #     print(if_condition.text)
+        #     f = SrcmlFilters(if_condition)
+        #     f.print_tree()
+        #     f.apply_all_filters()
+        #     print("_____________________")
+
+    def check_conditions(self):
+        print("CHECK")
+        for condition in self.conditions:
+            condition.check_condition()
 
     def post_process_token(self, tokens, keep_spaces):
         new_tokens=list()

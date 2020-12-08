@@ -292,25 +292,25 @@ class SrcmlFilters():
         '''
         if self.contain_name():
             print("CONTAIN_NAME")
-            return True
+            return True, "CONTAIN_NAME"
 
         if self.contain_operator_name():
             print("CONTAIN_OPERATOR_NAME")
-            return True
+            return True, "CONTAIN_OPERATOR_NAME"
 
         if self.contain_operator_name_name():
             print("CONTAIN_OPERATOR_NAME_NAME")
-            return True
+            return True, "CONTAIN_OPERATOR_NAME_NAME"
 
         if self.contain_operator_name_literal():
             print("CONTAIN_OPERATOR_NAME_LITERAL")
-            return True
+            return True, "CONTAIN_OPERATOR_NAME_LITERAL"
 
         if self.contain_equal():
             print("CONTAIN_EQUAL")
-            return True
+            return True, "CONTAIN_EQUAL"
 
-        return False
+        return False, ""
 
 
 def equal_value(node_target, node2):

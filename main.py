@@ -420,6 +420,9 @@ def process_json_file():
         # r.clone_repo("cloning_folder")
         r.add_files()
 
+        for f in r.files:
+            for m in f.methods:
+                m.check_conditions()
 
 
         break
@@ -443,6 +446,7 @@ def test_remove():
 
     curr=a[0]
 
+
     # bb=xml.find(curr)
     from bs4 import BeautifulSoup
     aa=BeautifulSoup("<new_condition>aa</new_condition>", "lxml")
@@ -455,8 +459,11 @@ def test_remove():
 
     # xml.find("condition").replaceWith(filter_new.xml_code)
 
-    xml.select_one("condition").name="BB"
-    xml.find("condition").name="BA"
+    # xml.select_one("condition").name="BB"
+    # xml.find("condition").name="BA"
+
+
+    xml.select("condition")[1].replaceWith(filter_new.xml_code)
 
 
     xml.select_one("condition").replaceWith(filter_new.xml_code)
