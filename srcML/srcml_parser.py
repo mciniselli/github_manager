@@ -79,10 +79,10 @@ class SrcmlParser():
         for m in methods:
             if_conditions=self.extract_all_tags("if", m)
 
-            print(len(if_conditions))
+            # print(len(if_conditions))
             for if_condition in if_conditions:
-                print(if_condition.text)
+                # print(if_condition.text)
                 f = SrcmlFilters(if_condition)
-                f.print_tree()
+                # f.print_tree()
                 f.apply_all_filters()
-                print("_____________________")
+                # print("_____________________")

@@ -218,7 +218,7 @@ class SrcmlFilters():
 
             if result:
                 # self.print_tree()
-                comparison_tree.print_tree()
+                # comparison_tree.print_tree()
                 return True
 
         return False

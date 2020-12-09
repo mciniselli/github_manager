@@ -1,14 +1,20 @@
 
 from srcML.srcml_filters import SrcmlFilters
 
+from utils.logger import Logger
+
 class Condition:
     def __init__(self, condition):
         self.condition=condition
         self.raw_code=condition.__str__()
+        self.text=condition.text
         # print(self.raw_code)
         # None = To be checked, True is OK, False is not OK
         self.is_ok=None
         self.type=None
+
+
+        self.srcml_filter=None
 
         self.start=None
         self.end=None
@@ -21,25 +27,34 @@ class Condition:
         except Exception as e:
             pass
 
+        self.log_class = Logger()
+        self.log = self.log_class.log
+
         # print("ADDED CONDITION")
         # print(self.condition)
         # print(self.raw_code)
 
+    def print_condition(self):
+        self.log.info("----------")
+        self.log.info(self.text)
+        self.log.info(self.condition)
+        self.log.info("IS OK: {}, TYPE: {}".format(self.is_ok, self.type))
+
+        self.log.info("----------")
+
+
     def check_condition(self):
 
         f=SrcmlFilters(self.condition)
-        f.print_tree()
+
+        self.srcml_filter=f
+
+        # f.print_tree()
         result, type=f.apply_all_filters()
-        print("___________")
 
         if result:
             self.is_ok=True
             self.type=type
+            self.print_condition()
         else:
             self.is_ok=False
-        # for if_condition in if_conditions:
-        #     print(if_condition.text)
-        #     f = SrcmlFilters(if_condition)
-        #     f.print_tree()
-        #     f.apply_all_filters()
-        #     print("_____________________")

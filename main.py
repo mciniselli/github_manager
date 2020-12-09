@@ -4,6 +4,7 @@ from utils.github_helper import GithubHelper
 import json
 import os
 from srcML.srcml_filters import SrcmlFilters, KeyValueNode, Fields
+from srcML.srcml_parser import SrcmlParser
 
 class Operation():
 
@@ -473,7 +474,23 @@ def test_remove():
     filters2.print_tree()
 
 
+def test_add_tag():
+    from srcML.srcml_filters import SrcmlFilters
+    xml_code = "<fake><function><if>if <condition>(<expr><name>var</name></expr>)</condition></if> <if>if <condition>(<expr><name>NEW</name></expr>)</condition> </if></function></fake>"
+    xml_code = "<fake><function><if test=\"A\">if <condition>(<expr><name>var</name></expr>)</condition></if> <if test=\"B\">if <condition>(<expr><name>NEW</name></expr>)</condition> </if></function></fake>"
 
+    parser = SrcmlParser(xml_code)
+
+    xml=parser.soup
+
+    xml.find("if",  {"test": "B"}).replaceWith("AA")
+
+    aa=1
+
+    # if_conditions = parser.extract_all_tags("if", parser.soup)
+    # for if_condition in if_conditions:
+    #     if_condition["test"]="CC"
+    # print(len(if_conditions))
 
 if __name__=="__main__":
     # main()
@@ -482,5 +499,6 @@ if __name__=="__main__":
     # test_merge_tree()
     # test_equal()
     # test()
-    process_json_file()
+    # process_json_file()
     # test_remove()
+    test_add_tag()
