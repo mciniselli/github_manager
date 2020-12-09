@@ -3,7 +3,7 @@ from srcML.srcml_parser import SrcmlParser
 from repoManager.method import Method
 
 class File:
-    def __init__(self, filename):
+    def __init__(self, filename: str):
         self.methods=None
         self.filename=filename
         self.methods=None

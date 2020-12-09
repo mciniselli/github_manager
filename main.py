@@ -403,7 +403,7 @@ def process_json_file():
     json_file = "json_data/results.json"
     file_data = read_file(json_file)
     data = json.loads(file_data[0])
-    items = (data["items"])
+    items = (data["items"])[:50]
     print(len(items))
 
     file_name="results.json"
@@ -418,15 +418,18 @@ def process_json_file():
         repo_url = "https://github.com/{}".format(repo_name)
         print(repo_url)
         r = Repo(repo_name, repo_url, repo_commit)
-        # r.clone_repo("cloning_folder")
+        r.clone_repo("cloning_folder")
         r.add_files()
 
         for f in r.files:
             for m in f.methods:
                 m.check_conditions()
 
+        from repoManager.store import Store
 
-        break
+        store = Store()
+        store.create_file_masked(r)
+
 
 def test_remove():
     from srcML.srcml_filters import SrcmlFilters
@@ -492,6 +495,47 @@ def test_add_tag():
     #     if_condition["test"]="CC"
     # print(len(if_conditions))
 
+def tt():
+
+    json_file = "json_data/results.json"
+    file_data = read_file(json_file)
+    data = json.loads(file_data[0])
+    items = (data["items"])
+    print(len(items))
+
+    file_name="results.json"
+
+    from repoManager.repo import Repo
+
+    r=None
+
+    for i, item in enumerate(items):
+
+        print("Processed {} repositories of out {}".format(i, len(items)))
+        repo_name = item["name"]
+        repo_commit = item["lastCommitSHA"]
+        repo_url = "https://github.com/{}".format(repo_name)
+        print(repo_url)
+        r = Repo(repo_name, repo_url, repo_commit)
+        # r.clone_repo("cloning_folder")
+        r.add_files()
+
+        for f in r.files:
+            for m in f.methods:
+                m.check_conditions()
+
+
+        break
+
+    from repoManager.store import Store
+
+    store=Store()
+    store.create_file_masked(r)
+
+
+
+
+
 if __name__=="__main__":
     # main()
     # test_srcml_parser()
@@ -499,6 +543,7 @@ if __name__=="__main__":
     # test_merge_tree()
     # test_equal()
     # test()
-    # process_json_file()
+    process_json_file()
     # test_remove()
-    test_add_tag()
+    # test_add_tag()
+    # tt()

@@ -1,11 +1,13 @@
 from bs4 import BeautifulSoup
 
 from anytree import Node, RenderTree
-
+import anytree
 import enum
 
-from utils.logger import Logger
+from typing import List
 
+from utils.logger import Logger
+import bs4
 '''
 We use this class to parametrize all the parameters in the code
 '''
@@ -33,7 +35,7 @@ class KeyValueNode():
 
 
 class SrcmlFilters():
-    def __init__(self, xml_code, is_string=False):
+    def __init__(self, xml_code, is_string: str=False):
         '''
         This is the initializer of the SrcmlFilters class. You can call che init function in two different ways:
         1. if you have already created the bs4 xml function, you can pass it to the init with @is_string = False
@@ -72,7 +74,7 @@ class SrcmlFilters():
             self.log.error("ERROR CREATION TREE")
 
 
-    def get_list_of_children(self, parent, skip=Fields.SKIP.value):
+    def get_list_of_children(self, parent: bs4.element.Tag, skip: bool=Fields.SKIP.value):
         '''
         This function is not used anymore. It allows you to get the list of the children (only name field) of the node @parent
         We use the @skip attribute the exclude from the result specific value we're not interested in
@@ -92,7 +94,7 @@ class SrcmlFilters():
             return list()
 
 
-    def get_list_of_children_with_text(self, parent, skip=Fields.SKIP.value):
+    def get_list_of_children_with_text(self, parent:bs4.element.Tag, skip=Fields.SKIP.value):
         '''
         This function allows you to extract the list of the children of the node @parent (a bs4 object)
         We use the @skip attribute the exclude from the result specific value we're not interested in
@@ -116,7 +118,7 @@ class SrcmlFilters():
         except Exception as e:
             return list()
 
-    def get_list_of_children_with_text_from_tree(self, parent, skip=Fields.SKIP.value):
+    def get_list_of_children_with_text_from_tree(self, parent: anytree.node.node.Node, skip=Fields.SKIP.value):
         '''
         This function allows you to extract the list of the children of the node @parent (a tree node)
         We use the @skip attribute the exclude from the result specific value we're not interested in
@@ -136,7 +138,7 @@ class SrcmlFilters():
         except Exception as e:
             return list()
 
-    def add_children_to_node(self, parent, xml, skip):
+    def add_children_to_node(self, parent: anytree.node.node.Node, xml: anytree.node.node.Node, skip: bool):
         '''
         This function is not used anymore. It allows you to add the children of @xml node (bs4 object) to the node @parent.
         We're considering only the attribute @name
@@ -150,7 +152,7 @@ class SrcmlFilters():
                 if c2.name == child:
                     self.add_children_to_node(c, c2, skip)
 
-    def add_children_to_node_with_text(self, parent, xml, skip):
+    def add_children_to_node_with_text(self, parent: anytree.node.node.Node, xml: anytree.node.node.Node, skip):
         '''
         This function allows you to add the children of @xml node (bs4 object) to the node @parent.
         Every node is made up by a key (the tag) and value (the text)
@@ -200,7 +202,7 @@ class SrcmlFilters():
         print("-----------")
         self.log.info("--------------")
 
-    def check_condition(self, conditions):
+    def check_condition(self, conditions: List[str]):
         '''
         Given a list of @conditions (a list of strings) this function converts each of them in a SrcmlFilters instance
         and check if the @self.tree has the same structure of at least one of them

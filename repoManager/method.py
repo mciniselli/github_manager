@@ -1,12 +1,15 @@
 from srcML.srcml_filters import SrcmlFilters
 from srcML.srcml_parser import SrcmlParser
 from repoManager.condition import Condition
+from typing import List
+
+import bs4
 
 import sys
 
 
 class Method():
-    def __init__(self, xml_code):
+    def __init__(self, xml_code: bs4.element.ResultSet):
         self.xml = xml_code
         self.raw_code = xml_code.__str__()
 
@@ -41,7 +44,7 @@ class Method():
         for condition in self.conditions:
             condition.check_condition()
 
-    def post_process_token(self, tokens, keep_spaces):
+    def post_process_token(self, tokens: List[str], keep_spaces: bool):
         new_tokens = list()
         for t in tokens:
             if len(t) == 0:
@@ -67,7 +70,7 @@ class Method():
 
         return new_tokens
 
-    def extract_list_of_tokens(self, node, keep_spaces=True):
+    def extract_list_of_tokens(self, node: bs4.element.Tag, keep_spaces: bool=True):
         result = list()
         index_local = 0
         for c in node.recursiveChildGenerator():

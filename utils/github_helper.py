@@ -29,10 +29,10 @@ class GithubHelper():
         if err == "TimeoutExpired":
             return False
 
-        if c.is_command_ok():
-            return True
+        if len(os.listdir(directory)) == 0:
+            return False
 
-        return False
+        return True
 
     def is_similar_to_tag(self, branch):
         '''

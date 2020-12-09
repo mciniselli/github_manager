@@ -2,9 +2,10 @@
 from srcML.srcml_filters import SrcmlFilters
 
 from utils.logger import Logger
+import bs4
 
 class Condition:
-    def __init__(self, condition):
+    def __init__(self, condition: bs4.element.ResultSet):
         self.condition=condition
         self.raw_code=condition.__str__()
         self.text=condition.text

@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
 from srcML.srcml_filters import SrcmlFilters
-
+import bs4
 from utils.logger import Logger
 
 class SrcmlParser():
@@ -13,7 +13,7 @@ class SrcmlParser():
         self.log_class = Logger()
         self.log = self.log_class.log
 
-    def extract_all_tags(self, tag, node):
+    def extract_all_tags(self, tag: str, node: bs4.element.Tag):
         '''
         This function use the select operator defined by beautifulsoup to return the list of all tag @tag
         inside the node @node
@@ -39,7 +39,7 @@ class SrcmlParser():
         '''
         self.methods = self.extract_all_tags("function", self.soup)
 
-    def check_contain_tag(self, tag, node):
+    def check_contain_tag(self, tag: str, node: bs4.element.Tag):
         '''
         This function uses the @extract_all_tags method to check if there are some tag @tag inside the node
         e.g.
@@ -53,7 +53,7 @@ class SrcmlParser():
             return True
         return False
 
-    def check_contain_if(self, node):
+    def check_contain_if(self, node: bs4.element.Tag):
         '''
         This function checks if there are some if tag in the node @node
         e.g.
@@ -81,6 +81,7 @@ class SrcmlParser():
 
             # print(len(if_conditions))
             for if_condition in if_conditions:
+
                 # print(if_condition.text)
                 f = SrcmlFilters(if_condition)
                 # f.print_tree()

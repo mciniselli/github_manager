@@ -7,7 +7,7 @@ class Logger:
     fh=None
     formatter=None
 
-    def __init__(self, name="logger.log"):
+    def __init__(self, name: str="logger.log"):
         self.log = logging.getLogger('LOGGER')
         self.fh = logging.FileHandler(os.path.join(os.getcwd(), name))
         self.formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -17,7 +17,7 @@ class Logger:
         self.ch = logging.StreamHandler()
         self.set_level()
 
-    def set_level(self, level=logging.DEBUG):
+    def set_level(self, level: int=logging.DEBUG):
         self.log.setLevel(level)
         self.fh.setLevel(level)
         self.ch.setLevel(level)
