@@ -27,5 +27,5 @@ class Logger:
 
         if len(self.log.handlers)==0:
             self.log.addHandler(self.fh)
-            self.log.addHandler(self.ch)
+            # self.log.addHandler(self.ch)
 

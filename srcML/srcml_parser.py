@@ -1,8 +1,7 @@
 from bs4 import BeautifulSoup
 from srcML.srcml_filters import SrcmlFilters
 import bs4
-from utils.logger import Logger
-
+import utils.settings as settings
 class SrcmlParser():
     def __init__(self, xml_code):
         self.methods = list()
@@ -10,8 +9,7 @@ class SrcmlParser():
         self.soup = BeautifulSoup(self.xml_code, 'lxml')
         self.contain_if = None
 
-        self.log_class = Logger()
-        self.log = self.log_class.log
+        self.log = settings.logger
 
     def extract_all_tags(self, tag: str, node: bs4.element.Tag):
         '''

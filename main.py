@@ -6,6 +6,8 @@ import os
 from srcML.srcml_filters import SrcmlFilters, KeyValueNode, Fields
 from srcML.srcml_parser import SrcmlParser
 
+from utils.settings import init_global
+
 class Operation():
 
     def max(values):
@@ -403,32 +405,37 @@ def process_json_file():
     json_file = "json_data/results.json"
     file_data = read_file(json_file)
     data = json.loads(file_data[0])
-    items = (data["items"])[0:10]
+    items = (data["items"])
     print(len(items))
 
     file_name="results.json"
 
+    from utils.logger import Logger
+    log=Logger("logger.log")
+
     from repoManager.repo import Repo
 
     for i, item in enumerate(items):
+        try:
+            print("Processed {} repositories of out {}".format(i+1, len(items)))
+            repo_name = item["name"]
+            repo_commit = item["lastCommitSHA"]
+            repo_url = "https://github.com/{}".format(repo_name)
+            print(repo_url)
+            r = Repo(repo_name, repo_url, repo_commit)
+            r.clone_repo("cloning_folder")
+            r.add_files()
 
-        print("Processed {} repositories of out {}".format(i+1, len(items)))
-        repo_name = item["name"]
-        repo_commit = item["lastCommitSHA"]
-        repo_url = "https://github.com/{}".format(repo_name)
-        print(repo_url)
-        r = Repo(repo_name, repo_url, repo_commit)
-        r.clone_repo("cloning_folder")
-        r.add_files()
+            for f in r.files:
+                for m in f.methods:
+                    m.check_conditions()
 
-        for f in r.files:
-            for m in f.methods:
-                m.check_conditions()
+            from repoManager.store import Store
 
-        from repoManager.store import Store
-
-        store = Store()
-        store.create_file_masked(r)
+            store = Store()
+            store.export_data(r)
+        except Exception as e:
+            print("ERROR")
 
 
 def test_remove():
@@ -537,6 +544,7 @@ def tt():
 
 
 if __name__=="__main__":
+    init_global("logger.log")
     # main()
     # test_srcml_parser()
     # test_tree()

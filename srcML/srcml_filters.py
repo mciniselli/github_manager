@@ -8,7 +8,7 @@ from typing import List
 
 from utils.logger import Logger
 import bs4
-
+import utils.settings as settings
 '''
 We use this class to parametrize all the parameters in the code
 '''
@@ -62,8 +62,7 @@ class SrcmlFilters():
         self.xml_code = xml_code_curr
         self.tree = None
 
-        self.log_class = Logger()
-        self.log = self.log_class.log
+        self.log = settings.logger
 
         try:
             '''

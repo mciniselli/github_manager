@@ -2,13 +2,12 @@ import codecs
 from utils.command_line import CommandLineHelper
 
 from utils.logger import Logger
-
+import utils.settings as settings
 class SrcmlManager():
     def __init__(self):
         self.xml_code=None
 
-        self.log_class=Logger()
-        self.log=self.log_class.log
+        self.log=settings.logger
 
     def read_file(self, filepath):
         '''

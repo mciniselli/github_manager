@@ -2,16 +2,14 @@ import os
 import shutil
 from utils.command_line import CommandLineHelper
 
-from utils.logger import Logger
-
+import utils.settings as settings
 
 class GithubHelper():
 
     def __init__(self):
         self.cmd = None
 
-        self.log_class = Logger()
-        self.log = self.log_class.log
+        self.log = settings.logger
 
     def clone(self, repo, directory):
         '''

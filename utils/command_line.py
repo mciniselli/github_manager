@@ -1,8 +1,7 @@
 from subprocess import Popen, PIPE, STDOUT, TimeoutExpired
 import os
 
-from utils.logger import Logger
-
+import utils.settings as settings
 
 class CommandLineHelper():
 
@@ -11,8 +10,7 @@ class CommandLineHelper():
         self.output = None
         self.error = None
 
-        self.log_class = Logger()
-        self.log = self.log_class.log
+        self.log = settings.logger
 
     def exec(self, cmd, cwd, timeout=600):
         '''

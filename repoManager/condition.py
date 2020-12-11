@@ -3,6 +3,7 @@ from srcML.srcml_filters import SrcmlFilters
 
 from utils.logger import Logger
 import bs4
+import utils.settings as settings
 
 class Condition:
     def __init__(self, condition: bs4.element.ResultSet):
@@ -27,9 +28,7 @@ class Condition:
             self.end=condition["pos:end"]
         except Exception as e:
             pass
-
-        self.log_class = Logger()
-        self.log = self.log_class.log
+        self.log = settings.logger
 
         # print("ADDED CONDITION")
         # print(self.condition)
