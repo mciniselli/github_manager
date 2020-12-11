@@ -403,7 +403,7 @@ def process_json_file():
     json_file = "json_data/results.json"
     file_data = read_file(json_file)
     data = json.loads(file_data[0])
-    items = (data["items"])[:50]
+    items = (data["items"])[3:4]
     print(len(items))
 
     file_name="results.json"

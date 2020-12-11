@@ -13,6 +13,8 @@ class Method():
         self.xml = xml_code
         self.raw_code = xml_code.__str__()
 
+        self.text=self.xml.text
+
         self.conditions = list()
         self.start = None
         self.end = None

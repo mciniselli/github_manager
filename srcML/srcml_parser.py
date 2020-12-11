@@ -38,6 +38,7 @@ class SrcmlParser():
         print(len(parser.methods))
         '''
         self.methods = self.extract_all_tags("function", self.soup)
+        self.methods+= self.extract_all_tags("constructor", self.soup)
 
     def check_contain_tag(self, tag: str, node: bs4.element.Tag):
         '''

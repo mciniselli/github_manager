@@ -27,12 +27,12 @@ class GithubHelper():
         out, err = c.exec(cmd, directory)
 
         if err == "TimeoutExpired":
-            return False
+            return False, err
 
         if len(os.listdir(directory)) == 0:
-            return False
+            return False, "NoClone"
 
-        return True
+        return True, "OK"
 
     def is_similar_to_tag(self, branch):
         '''

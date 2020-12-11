@@ -3,18 +3,18 @@ import os
 
 from utils.logger import Logger
 
+
 class CommandLineHelper():
 
     def __init__(self):
-        self.cmd=None
-        self.output=None
-        self.error=None
+        self.cmd = None
+        self.output = None
+        self.error = None
 
-        self.log_class=Logger()
-        self.log=self.log_class.log
+        self.log_class = Logger()
+        self.log = self.log_class.log
 
-
-    def exec(self, cmd, cwd, timeout=60):
+    def exec(self, cmd, cwd, timeout=240):
         '''
         This function execute the command @cmd using @cwd as working directory
         Then save the output in @self.output and the error in @self.error
@@ -33,22 +33,19 @@ class CommandLineHelper():
 
         output = output.decode()
         error = error.decode()
-        self.output=output
-        self.error=error
+        self.output = output
+        self.error = error
 
         return output, error
-
 
     def is_command_ok(self):
         '''
         This function check if previous command is OK, reading the content of @self.error
         Sometimes there are commands that use the std error in a wrong way (e.g. the message cloning from git clone come out from std error)
         '''
-        if self.error==None:
+        if self.error == None:
             return True
-        if len(self.error)==0:
+        if len(self.error) == 0:
             return True
 
         return False
-
-
