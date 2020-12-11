@@ -8,9 +8,12 @@ from typing import List
 
 from utils.logger import Logger
 import bs4
+
 '''
 We use this class to parametrize all the parameters in the code
 '''
+
+
 class Fields(enum.Enum):
     NAME = "name"
     TEXT = "text"
@@ -26,6 +29,7 @@ class KeyValueNode():
     '''
     This class is a single node in the tree. It is made up by the @key (the tag in the xml) and the @value (the text field, "" if missing)
     '''
+
     def __init__(self, key, value):
         self.key = key
         self.value = value
@@ -35,7 +39,7 @@ class KeyValueNode():
 
 
 class SrcmlFilters():
-    def __init__(self, xml_code, is_string: str=False):
+    def __init__(self, xml_code, is_string: str = False):
         '''
         This is the initializer of the SrcmlFilters class. You can call che init function in two different ways:
         1. if you have already created the bs4 xml function, you can pass it to the init with @is_string = False
@@ -73,8 +77,7 @@ class SrcmlFilters():
         except Exception as e:
             self.log.error("ERROR CREATION TREE")
 
-
-    def get_list_of_children(self, parent: bs4.element.Tag, skip: bool=Fields.SKIP.value):
+    def get_list_of_children(self, parent: bs4.element.Tag, skip: bool = Fields.SKIP.value):
         '''
         This function is not used anymore. It allows you to get the list of the children (only name field) of the node @parent
         We use the @skip attribute the exclude from the result specific value we're not interested in
@@ -93,8 +96,7 @@ class SrcmlFilters():
         except Exception as e:
             return list()
 
-
-    def get_list_of_children_with_text(self, parent:bs4.element.Tag, skip=Fields.SKIP.value):
+    def get_list_of_children_with_text(self, parent: bs4.element.Tag, skip=Fields.SKIP.value):
         '''
         This function allows you to extract the list of the children of the node @parent (a bs4 object)
         We use the @skip attribute the exclude from the result specific value we're not interested in
@@ -257,6 +259,21 @@ class SrcmlFilters():
             "<if><condition>(<expr><literal></literal><operator></operator><name></name></expr>)</condition></if>"]
         return self.check_condition(conditions)
 
+    def contain_operator_operator_name_literal(self):
+        '''
+        This function check if the current condition has the same form of the following sentences(the operator in the sentences
+        is an example, we don't care about the operator itself)
+        if(variable_name>-1)
+        if(literal==+10)
+        We check the presence of + or -
+        '''
+        conditions = [
+
+            "<if><condition>(<expr><name_literal></name_literal><operator></operator><operator>-</operator><name_literal></name_literal></expr>)</condition></if>",
+            "<if><condition>(<expr><name_literal></name_literal><operator></operator><operator>+</operator><name_literal></name_literal></expr>)</condition></if>"]
+
+        return self.check_condition(conditions)
+
     def contain_operator_name_name(self):
         '''
         This function check if the current condition has the same form of the following sentence (the operator in the sentences
@@ -307,7 +324,9 @@ class SrcmlFilters():
         if self.contain_operator_name_literal():
             print("CONTAIN_OPERATOR_NAME_LITERAL")
             return True, "CONTAIN_OPERATOR_NAME_LITERAL"
-
+        if self.contain_operator_operator_name_literal():
+            print("CONTAIN_OPEARTOR_OPERATOR_NAME_LITERAL")
+            return True, "CONTAIN_OPEARTOR_OPERATOR_NAME_LITERAL"
         if self.contain_equal():
             print("CONTAIN_EQUAL")
             return True, "CONTAIN_EQUAL"

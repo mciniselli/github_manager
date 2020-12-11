@@ -89,6 +89,13 @@ class Store:
 
         os.makedirs(export_dir)
 
+        condition_ok=FileManager("condition_ok.txt")
+        condition_ok.open_file("a+")
+        condition_ko=FileManager("condition_ko.txt")
+        condition_ko.open_file("a+")
+        repo_status=FileManager("repo_status.txt")
+        repo_status.open_file("a+")
+
 
         f=FileManager(os.path.join(export_dir, "repo_info.txt"))
         f.open_file("w+")
@@ -103,6 +110,9 @@ class Store:
         f.write_file("IS_TAG: {}".format(repo.is_tag))
         f.close_file()
 
+        repo_status.write_file("{} {} {} {} {} {}".format(repo.repository_name, repo.repository_url, repo.is_repo_ok, repo.message_clone, repo.version, repo.is_tag))
+        repo_status.close_file()
+
         f = FileManager(os.path.join(export_dir, "list_of_files.txt"))
         f.open_file("w+")
         for file in repo.files:
@@ -115,7 +125,7 @@ class Store:
             shutil.copy(file.filename.replace(".java", ".xml"), os.path.join(file_dir, filename).replace(".java", ".xml"))
             for i, method in enumerate(file.methods):
                 m=FileManager(os.path.join(file_dir, "METHOD_{}.txt".format(i)))
-                m.open_file()
+                m.open_file("w+")
                 m.write_file("METHOD START {}, END {}".format(method.start, method.end))
                 m.write_file(method.raw_code)
                 m.write_file("__________")
@@ -133,11 +143,20 @@ class Store:
                     m.write_file("__________")
                     m.write_file(condition.text)
 
+                    if condition.is_ok:
+                        condition_ok.write_file(condition.text)
+                        condition_ok.write_file("__________")
+                    else:
+                        condition_ko.write_file(condition.text)
+                        condition_ko.write_file("__________")
+
                 m.close_file()
 
 
         f.close_file()
 
+        condition_ok.close_file()
+        condition_ko.close_file()
 
 
 

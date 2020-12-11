@@ -52,7 +52,7 @@ class Repo:
         files = self.get_list_of_files(self.cloned_directory)
         java_files = [os.path.join(os.getcwd(), f) for f in files if f.endswith(".java")]
         files = list()
-        for f in java_files[:3]:
+        for f in java_files:
             file = File(f)
             files.append(file)
 

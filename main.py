@@ -403,7 +403,7 @@ def process_json_file():
     json_file = "json_data/results.json"
     file_data = read_file(json_file)
     data = json.loads(file_data[0])
-    items = (data["items"])[3:4]
+    items = (data["items"])[0:10]
     print(len(items))
 
     file_name="results.json"
@@ -412,7 +412,7 @@ def process_json_file():
 
     for i, item in enumerate(items):
 
-        print("Processed {} repositories of out {}".format(i, len(items)))
+        print("Processed {} repositories of out {}".format(i+1, len(items)))
         repo_name = item["name"]
         repo_commit = item["lastCommitSHA"]
         repo_url = "https://github.com/{}".format(repo_name)

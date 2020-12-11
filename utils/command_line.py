@@ -14,7 +14,7 @@ class CommandLineHelper():
         self.log_class = Logger()
         self.log = self.log_class.log
 
-    def exec(self, cmd, cwd, timeout=240):
+    def exec(self, cmd, cwd, timeout=600):
         '''
         This function execute the command @cmd using @cwd as working directory
         Then save the output in @self.output and the error in @self.error

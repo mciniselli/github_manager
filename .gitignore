@@ -80,6 +80,7 @@ venv
 .idea
 preliminary_test
 cloning_folder
+export
 
 # Specific file extension if root folder
 *.txt
