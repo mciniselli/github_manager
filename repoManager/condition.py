@@ -6,10 +6,11 @@ import bs4
 import utils.settings as settings
 
 class Condition:
-    def __init__(self, condition: bs4.element.ResultSet):
+    def __init__(self, condition: bs4.element.ResultSet, id: int):
         self.condition=condition
         self.raw_code=condition.__str__()
         self.text=condition.text
+        self.id=id
         # print(self.raw_code)
         # None = To be checked, True is OK, False is not OK
         self.is_ok=None

@@ -9,8 +9,9 @@ import sys
 
 
 class Method():
-    def __init__(self, xml_code: bs4.element.ResultSet):
+    def __init__(self, xml_code: bs4.element.ResultSet, id: int):
         self.xml = xml_code
+        self.id = id
         self.raw_code = xml_code.__str__()
 
         self.text=self.xml.text
@@ -33,8 +34,8 @@ class Method():
 
         if_conditions = parser.extract_all_tags("if", parser.soup)
 
-        for if_condition in if_conditions:
-            self.conditions.append(Condition(if_condition))
+        for i, if_condition in enumerate(if_conditions):
+            self.conditions.append(Condition(if_condition, i))
 
     def check_conditions(self):
         for condition in self.conditions:

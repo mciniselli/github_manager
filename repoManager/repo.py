@@ -5,7 +5,8 @@ from repoManager.file import File
 
 
 class Repo:
-    def __init__(self, repository_name: str, repository_url: str, commit: str):
+    def __init__(self, repository_name: str, repository_url: str, commit: str, id: int):
+        self.id=id
         self.repository_name = repository_name
         self.repository_url = repository_url
         self.commit = commit
@@ -51,8 +52,8 @@ class Repo:
 
         files = self.get_list_of_files(self.cloned_directory)
         java_files = [os.path.join(os.getcwd(), f) for f in files if f.endswith(".java")]
-        for f in java_files: # passare un indice
-            file = File(f)
+        for i, f in enumerate(java_files): # passare un indice
+            file = File(f, i)
             file.add_methods()
             self.files.append(file)
 

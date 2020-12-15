@@ -309,25 +309,25 @@ class SrcmlFilters():
         filters.apply_all_filters()
         '''
         if self.contain_name():
-            print("CONTAIN_NAME")
+            # print("CONTAIN_NAME")
             return True, "CONTAIN_NAME"
 
         if self.contain_operator_name():
-            print("CONTAIN_OPERATOR_NAME")
+            # print("CONTAIN_OPERATOR_NAME")
             return True, "CONTAIN_OPERATOR_NAME"
 
         if self.contain_operator_name_name():
-            print("CONTAIN_OPERATOR_NAME_NAME")
+            # print("CONTAIN_OPERATOR_NAME_NAME")
             return True, "CONTAIN_OPERATOR_NAME_NAME"
 
         if self.contain_operator_name_literal():
-            print("CONTAIN_OPERATOR_NAME_LITERAL")
+            # print("CONTAIN_OPERATOR_NAME_LITERAL")
             return True, "CONTAIN_OPERATOR_NAME_LITERAL"
         if self.contain_operator_operator_name_literal():
-            print("CONTAIN_OPEARTOR_OPERATOR_NAME_LITERAL")
+            # print("CONTAIN_OPEARTOR_OPERATOR_NAME_LITERAL")
             return True, "CONTAIN_OPEARTOR_OPERATOR_NAME_LITERAL"
         if self.contain_equal():
-            print("CONTAIN_EQUAL")
+            # print("CONTAIN_EQUAL")
             return True, "CONTAIN_EQUAL"
 
         return False, ""

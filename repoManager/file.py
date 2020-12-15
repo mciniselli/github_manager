@@ -5,10 +5,11 @@ import utils.settings as settings
 
 
 class File:
-    def __init__(self, filename: str):
+    def __init__(self, filename: str, id: int):
         self.methods = list()
         self.filename = filename
-        self.methods = None
+        self.id=id
+        self.methods = list()
         self.log=settings.logger
 
 
@@ -20,8 +21,8 @@ class File:
         p.extract_methods()
         self.log.info(len(p.methods))
 
-        for m in p.methods:
-            meth = Method(m)
+        for i, m in enumerate(p.methods):
+            meth = Method(m, i)
             meth.add_conditions()
             self.methods.append(meth)
 

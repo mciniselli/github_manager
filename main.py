@@ -405,8 +405,11 @@ def process_json_file():
     json_file = "json_data/results.json"
     file_data = read_file(json_file)
     data = json.loads(file_data[0])
-    items = (data["items"])
+    items = (data["items"])[0:10]
     print(len(items))
+
+    # for i, item in enumerate(items):
+    #     print(i, item)
 
     file_name="results.json"
 
@@ -422,7 +425,7 @@ def process_json_file():
             repo_commit = item["lastCommitSHA"]
             repo_url = "https://github.com/{}".format(repo_name)
             print(repo_url)
-            r = Repo(repo_name, repo_url, repo_commit)
+            r = Repo(repo_name, repo_url, repo_commit, i)
             r.clone_repo("cloning_folder")
             r.add_files()
 
@@ -435,7 +438,7 @@ def process_json_file():
             store = Store()
             store.export_data(r)
         except Exception as e:
-            print("ERROR")
+            print("ERROR {}".format(e))
 
 
 def test_remove():
