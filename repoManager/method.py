@@ -27,20 +27,14 @@ class Method():
         except Exception as e:
             pass
 
-        self.add_conditions()
-
     def add_conditions(self):
 
         parser = SrcmlParser(self.raw_code)
 
         if_conditions = parser.extract_all_tags("if", parser.soup)
 
-        conditions = list()
-
         for if_condition in if_conditions:
-            conditions.append(Condition(if_condition))
-
-        self.conditions = conditions
+            self.conditions.append(Condition(if_condition))
 
     def check_conditions(self):
         for condition in self.conditions:

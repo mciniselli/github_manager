@@ -2,6 +2,8 @@ from bs4 import BeautifulSoup
 from srcML.srcml_filters import SrcmlFilters
 import bs4
 import utils.settings as settings
+
+
 class SrcmlParser():
     def __init__(self, xml_code):
         self.methods = list()
@@ -36,7 +38,7 @@ class SrcmlParser():
         print(len(parser.methods))
         '''
         self.methods = self.extract_all_tags("function", self.soup)
-        self.methods+= self.extract_all_tags("constructor", self.soup)
+        self.methods += self.extract_all_tags("constructor", self.soup)
 
     def check_contain_tag(self, tag: str, node: bs4.element.Tag):
         '''
@@ -74,13 +76,12 @@ class SrcmlParser():
         parser.extract_methods()
         parser.apply_filters_if()
         '''
-        methods=self.methods
+        methods = self.methods
         for m in methods:
-            if_conditions=self.extract_all_tags("if", m)
+            if_conditions = self.extract_all_tags("if", m)
 
             # print(len(if_conditions))
             for if_condition in if_conditions:
-
                 # print(if_condition.text)
                 f = SrcmlFilters(if_condition)
                 # f.print_tree()
