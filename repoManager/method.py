@@ -9,27 +9,34 @@ import codecs
 
 from subprocess import Popen, PIPE, STDOUT
 
-import  utils.settings as settings
+import utils.settings as settings
+import re
+
 
 class Method():
-    def __init__(self, xml_code: bs4.element.ResultSet, id: int, abstraction: bool= False):
+    def __init__(self, xml_code: bs4.element.ResultSet, id: int, abstraction: bool = False):
         self.xml = xml_code
         self.id = id
         self.raw_code = xml_code.__str__()
 
-        self.text=self.xml.text
+        self.text = self.xml.text
 
         self.conditions = list()
         self.start = None
         self.end = None
 
-        self.abstraction_required=abstraction
-        self.abstract=None
-        self.dict_abstract=None
-        self.abstraction_ok=True
+        self.abstraction_required = abstraction
+        self.abstract = None
+        self.dict_abstract = None
+        self.abstraction_ok = True
 
-        self.log=settings.logger
+        self.num_tokens = len(self.extract_list_of_tokens(self.xml, keep_spaces=False))
 
+        self.num_lines = self.count_lines()
+
+        self.has_nested_method = self.exist_nested_method()
+
+        self.log = settings.logger
 
         try:
             self.start = xml_code["pos:start"]
@@ -42,8 +49,8 @@ class Method():
 
         if abstraction:
             try:
-                abstraction_folder="abstraction/temp"
-                abstraction_jar="abstraction"
+                abstraction_folder = "abstraction/temp"
+                abstraction_jar = "abstraction"
                 self.write_method(abstraction_folder)
 
                 cmd = "java -jar src2abs-0.1-jar-with-dependencies.jar single method ./temp/{}.java ./temp/{}_abs.java ./Idioms.csv".format(
@@ -53,23 +60,40 @@ class Method():
                 output = p.stdout.read()
 
                 f = open(os.path.join(abstraction_folder, "{}_abs.java".format(self.id)), "r")
-                self.abstract=f.read()
+                self.abstract = f.read()
                 f.close()
 
                 f = open(os.path.join(abstraction_folder, "{}_abs.java.map".format(self.id)), "r")
-                self.dict_abstract=f.read()
+                self.dict_abstract = f.read()
                 f.close()
 
             except Exception as e:
                 self.log.error("Error abstraction method {}".format(self.id))
-                self.abstraction_ok=False
+                self.abstraction_ok = False
 
+    def count_lines(self):
+        '''
+        count the number of lines (lines with less than 3 chars do not count, we remove all the comments)
+        '''
+
+        raw_code = self.raw_code
+
+        res = re.sub("(?s)<comment.*?</comment>", "", raw_code);
+        res = (re.sub(r'\<[^>]*\>', '', res))
+
+        lines = res.split("\n")
+
+        num_lines = 0
+        for line in lines:
+            if len(line) > 2:
+                num_lines += 1
+
+        return num_lines
 
     def write_method(self, destination_folder):
         f = codecs.open(os.path.join(destination_folder, "{}.java".format(self.id)), "w+")
         f.write(self.text)
         f.close()
-
 
     def add_conditions(self):
 
@@ -110,7 +134,7 @@ class Method():
 
         return new_tokens
 
-    def extract_list_of_tokens(self, node: bs4.element.Tag, keep_spaces: bool=True):
+    def extract_list_of_tokens(self, node: bs4.element.Tag, keep_spaces: bool = True):
         result = list()
         index_local = 0
         for c in node.recursiveChildGenerator():
@@ -119,3 +143,10 @@ class Method():
                 index_local += 1
         result = self.post_process_token(result, keep_spaces)
         return result
+
+    def exist_nested_method(self):
+        res = self.xml.select("function")
+        res2 = self.xml.select("constructor")
+        if len(res) + len(res2) > 0:
+            return True
+        return False

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.srcML.org/srcML/src" xmlns:pos="http://www.srcML.org/srcML/position" revision="1.0.0" language="Java" filename="/Users/matteo.ciniselli/Desktop/Matteo/Github_mciniselli/github_manager/test/method_nested/method_nested.java" pos:tabs="8"><class pos:start="1:1" pos:end="25:1"><specifier pos:start="1:1" pos:end="1:6">public</specifier> class <name pos:start="1:14" pos:end="1:16">GFG</name> <block pos:start="1:18" pos:end="25:1">{ 
+  
+    <comment type="line" pos:start="3:5" pos:end="3:50">// create a local interface with one abstract </comment>
+    <comment type="line" pos:start="4:5" pos:end="4:20">// method run() </comment>
+    <interface pos:start="5:5" pos:end="7:5">interface <name pos:start="5:15" pos:end="5:25">myInterface</name> <block pos:start="5:27" pos:end="7:5">{ 
+        <function_decl pos:start="6:9" pos:end="6:19"><type pos:start="6:9" pos:end="6:12"><name pos:start="6:9" pos:end="6:12">void</name></type> <name pos:start="6:14" pos:end="6:16">run</name><parameter_list pos:start="6:17" pos:end="6:18">()</parameter_list>;</function_decl> 
+    }</block></interface> 
+  
+    <comment type="line" pos:start="9:5" pos:end="9:55">// function have implements another function run() </comment>
+    <function pos:start="10:5" pos:end="20:5"><type pos:start="10:5" pos:end="10:15"><specifier pos:start="10:5" pos:end="10:10">static</specifier> <name pos:start="10:12" pos:end="10:15">void</name></type> <name pos:start="10:17" pos:end="10:19">Foo</name><parameter_list pos:start="10:20" pos:end="10:21">()</parameter_list> 
+    <block pos:start="11:5" pos:end="20:5">{<block_content pos:start="13:9" pos:end="19:16"> 
+        <comment type="line" pos:start="12:9" pos:end="12:54">// implement run method inside Foo() function </comment>
+        <decl_stmt pos:start="13:9" pos:end="18:10"><decl pos:start="13:9" pos:end="18:9"><type pos:start="13:9" pos:end="13:19"><name pos:start="13:9" pos:end="13:19">myInterface</name></type> <name pos:start="13:21" pos:end="13:21">r</name> <init pos:start="13:23" pos:end="18:9">= <expr pos:start="13:25" pos:end="18:9"><operator pos:start="13:25" pos:end="13:27">new</operator> <class pos:start="13:29" pos:end="18:9"><super pos:start="13:29" pos:end="13:39"><name pos:start="13:29" pos:end="13:39">myInterface</name></super><argument_list pos:start="13:40" pos:end="13:41">()</argument_list> <block pos:start="13:43" pos:end="18:9">{ 
+            <function pos:start="14:13" pos:end="17:13"><type pos:start="14:13" pos:end="14:23"><specifier pos:start="14:13" pos:end="14:18">public</specifier> <name pos:start="14:20" pos:end="14:23">void</name></type> <name pos:start="14:25" pos:end="14:27">run</name><parameter_list pos:start="14:28" pos:end="14:29">()</parameter_list> 
+            <block pos:start="15:13" pos:end="17:13">{<block_content pos:start="16:17" pos:end="16:52"> 
+                <expr_stmt pos:start="16:17" pos:end="16:52"><expr pos:start="16:17" pos:end="16:51"><call pos:start="16:17" pos:end="16:51"><name pos:start="16:17" pos:end="16:34"><name pos:start="16:17" pos:end="16:22">System</name><operator pos:start="16:23" pos:end="16:23">.</operator><name pos:start="16:24" pos:end="16:26">out</name><operator pos:start="16:27" pos:end="16:27">.</operator><name pos:start="16:28" pos:end="16:34">println</name></name><argument_list pos:start="16:35" pos:end="16:51">(<argument pos:start="16:36" pos:end="16:50"><expr pos:start="16:36" pos:end="16:50"><literal type="string" pos:start="16:36" pos:end="16:50">"geeksforgeeks"</literal></expr></argument>)</argument_list></call></expr>;</expr_stmt> 
+            </block_content>}</block></function><empty_stmt pos:start="17:14" pos:end="17:14">;</empty_stmt> 
+        }</block></class></expr></init></decl>;</decl_stmt> 
+        <expr_stmt pos:start="19:9" pos:end="19:16"><expr pos:start="19:9" pos:end="19:15"><call pos:start="19:9" pos:end="19:15"><name pos:start="19:9" pos:end="19:13"><name pos:start="19:9" pos:end="19:9">r</name><operator pos:start="19:10" pos:end="19:10">.</operator><name pos:start="19:11" pos:end="19:13">run</name></name><argument_list pos:start="19:14" pos:end="19:15">()</argument_list></call></expr>;</expr_stmt> 
+    </block_content>}</block></function> 
+    <function pos:start="21:5" pos:end="24:5"><type pos:start="21:5" pos:end="21:22"><specifier pos:start="21:5" pos:end="21:10">public</specifier> <specifier pos:start="21:12" pos:end="21:17">static</specifier> <name pos:start="21:19" pos:end="21:22">void</name></type> <name pos:start="21:24" pos:end="21:27">main</name><parameter_list pos:start="21:28" pos:end="21:42">(<parameter pos:start="21:29" pos:end="21:41"><decl pos:start="21:29" pos:end="21:41"><type pos:start="21:29" pos:end="21:36"><name pos:start="21:29" pos:end="21:36"><name pos:start="21:29" pos:end="21:34">String</name><index pos:start="21:35" pos:end="21:36">[]</index></name></type> <name pos:start="21:38" pos:end="21:41">args</name></decl></parameter>)</parameter_list> 
+    <block pos:start="22:5" pos:end="24:5">{<block_content pos:start="23:9" pos:end="23:14"> 
+        <expr_stmt pos:start="23:9" pos:end="23:14"><expr pos:start="23:9" pos:end="23:13"><call pos:start="23:9" pos:end="23:13"><name pos:start="23:9" pos:end="23:11">Foo</name><argument_list pos:start="23:12" pos:end="23:13">()</argument_list></call></expr>;</expr_stmt> 
+    </block_content>}</block></function> 
+}</block></class> 
+</unit>

@@ -194,7 +194,7 @@ class Store:
                         os.path.join(file_dir, "source.xml"))
 
             m = FileManager(os.path.join(file_dir, "method_info.csv"))
-            fields_method = ["ID", "START", "END", "NUM_CONDITION", "NUM_CONDITION_OK", "ABSTRACTION_REQUIRED", "ABSTRACTION_OK"]
+            fields_method = ["ID", "START", "END", "NUM_CONDITION", "NUM_CONDITION_OK", "ABSTRACTION_REQUIRED", "ABSTRACTION_OK", "NUM_TOKENS", "NUM_LINES", "HAS_NESTED_METHOD"]
 
             m.open_file_csv("w+", fields_method)
 
@@ -205,7 +205,8 @@ class Store:
                     if condition.is_ok:
                         num_ok += 1
 
-                values_method = [str(method.id), method.start, method.end, str(len(method.conditions)), str(num_ok), str(method.abstraction_required), str(method.abstraction_ok)]
+                values_method = [str(method.id), method.start, method.end, str(len(method.conditions)), str(num_ok),
+                                 str(method.abstraction_required), str(method.abstraction_ok), str(method.num_tokens), str(method.num_lines), str(method.has_nested_method)]
 
 
                 dict_method = dict()

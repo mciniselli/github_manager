@@ -404,8 +404,8 @@ def test():
 def process_json_file():
     json_file = "json_data/results.json"
 
-    start=4
-    end=5
+    start=0
+    end=10
     do_abstraction=False
 
 
@@ -603,9 +603,9 @@ if __name__=="__main__":
     # test_merge_tree()
     # test_equal()
     # test()
-    # process_json_file()
+    process_json_file()
     # test_remove()
     # test_add_tag()
     # tt()
     # test_src2abs()
-    method_nested()
+    # method_nested()
