@@ -403,9 +403,15 @@ def test():
 
 def process_json_file():
     json_file = "json_data/results.json"
+
+    start=4
+    end=5
+    do_abstraction=False
+
+
     file_data = read_file(json_file)
     data = json.loads(file_data[0])
-    items = (data["items"])[0:10]
+    items = (data["items"])[start:end]
     print(len(items))
 
     # for i, item in enumerate(items):
@@ -418,6 +424,9 @@ def process_json_file():
 
     from repoManager.repo import Repo
 
+    from datetime import datetime
+    print(datetime.now())
+
     for i, item in enumerate(items):
         try:
             print("Processed {} repositories of out {}".format(i+1, len(items)))
@@ -425,7 +434,7 @@ def process_json_file():
             repo_commit = item["lastCommitSHA"]
             repo_url = "https://github.com/{}".format(repo_name)
             print(repo_url)
-            r = Repo(repo_name, repo_url, repo_commit, i)
+            r = Repo(repo_name, repo_url, repo_commit, start+i, do_abstraction)
             r.clone_repo("cloning_folder")
             r.add_files()
 
@@ -440,6 +449,7 @@ def process_json_file():
         except Exception as e:
             print("ERROR {}".format(e))
 
+    print(datetime.now())
 
 def test_remove():
     from srcML.srcml_filters import SrcmlFilters
@@ -543,7 +553,32 @@ def tt():
     store.create_file_masked(r)
 
 
+def test_src2abs():
 
+    cwd="abstraction"
+
+    file_to_process=os.listdir(cwd)
+
+    n=100
+    file="source_method2.java"
+    import shutil
+    from subprocess import Popen, PIPE, \
+        STDOUT  # use subprocess to run a python file inside the script. It is quicker than os.system()
+
+    from datetime import datetime
+    print(datetime.now())
+
+    for i in range(n):
+        if os.path.exists(os.path.join(cwd, file.replace("2", str(i)))) == False:
+            shutil.copy(os.path.join(cwd, file), os.path.join(cwd, file.replace("2", str(i))))
+
+    for i in range(n):
+        cmd = "java -jar src2abs-0.1-jar-with-dependencies.jar single method ./source_method{}.java ./source_method{}_abs.java ./Java_Idioms.csv".format(i, i)
+
+        p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True, cwd=cwd)
+        output = p.stdout.read()
+
+    print(datetime.now())
 
 
 if __name__=="__main__":
@@ -558,3 +593,4 @@ if __name__=="__main__":
     # test_remove()
     # test_add_tag()
     # tt()
+    # test_src2abs()

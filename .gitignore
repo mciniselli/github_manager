@@ -81,6 +81,7 @@ venv
 preliminary_test
 cloning_folder
 export
+abstraction
 
 # Specific file extension if root folder
 *.txt

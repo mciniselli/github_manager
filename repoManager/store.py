@@ -194,7 +194,7 @@ class Store:
                         os.path.join(file_dir, "source.xml"))
 
             m = FileManager(os.path.join(file_dir, "method_info.csv"))
-            fields_method = ["ID", "START", "END", "NUM_CONDITION", "NUM_CONDITION_OK"]
+            fields_method = ["ID", "START", "END", "NUM_CONDITION", "NUM_CONDITION_OK", "ABSTRACTION_REQUIRED", "ABSTRACTION_OK"]
 
             m.open_file_csv("w+", fields_method)
 
@@ -205,7 +205,8 @@ class Store:
                     if condition.is_ok:
                         num_ok += 1
 
-                values_method = [str(method.id), method.start, method.end, str(len(method.conditions)), str(num_ok)]
+                values_method = [str(method.id), method.start, method.end, str(len(method.conditions)), str(num_ok), str(method.abstraction_required), str(method.abstraction_ok)]
+
 
                 dict_method = dict()
                 for x, y in zip(fields_method, values_method):
@@ -224,6 +225,17 @@ class Store:
                 write_file.open_file_txt("w+")
                 write_file.write_file_txt(method.raw_code)
                 write_file.close_file()
+
+                if method.abstraction_required and method.abstraction_ok:
+                    write_file = FileManager(os.path.join(method_dir, "abstract.java"))
+                    write_file.open_file_txt("w+")
+                    write_file.write_file_txt(method.abstract)
+                    write_file.close_file()
+
+                    write_file = FileManager(os.path.join(method_dir, "abstract.java.map"))
+                    write_file.open_file_txt("w+")
+                    write_file.write_file_txt(method.dict_abstract)
+                    write_file.close_file()
 
                 c = FileManager(os.path.join(method_dir, "condition_info.csv"))
                 fields_condition = ["ID", "START", "END", "IS_OK", "TYPE"]

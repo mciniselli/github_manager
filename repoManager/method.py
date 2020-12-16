@@ -2,14 +2,17 @@ from srcML.srcml_filters import SrcmlFilters
 from srcML.srcml_parser import SrcmlParser
 from repoManager.condition import Condition
 from typing import List
-
+import os
 import bs4
-
 import sys
+import codecs
 
+from subprocess import Popen, PIPE, STDOUT
+
+import  utils.settings as settings
 
 class Method():
-    def __init__(self, xml_code: bs4.element.ResultSet, id: int):
+    def __init__(self, xml_code: bs4.element.ResultSet, id: int, abstraction: bool= False):
         self.xml = xml_code
         self.id = id
         self.raw_code = xml_code.__str__()
@@ -19,6 +22,15 @@ class Method():
         self.conditions = list()
         self.start = None
         self.end = None
+
+        self.abstraction_required=abstraction
+        self.abstract=None
+        self.dict_abstract=None
+        self.abstraction_ok=True
+
+        self.log=settings.logger
+
+
         try:
             self.start = xml_code["pos:start"]
         except Exception as e:
@@ -27,6 +39,37 @@ class Method():
             self.end = xml_code["pos:end"]
         except Exception as e:
             pass
+
+        if abstraction:
+            try:
+                abstraction_folder="abstraction/temp"
+                abstraction_jar="abstraction"
+                self.write_method(abstraction_folder)
+
+                cmd = "java -jar src2abs-0.1-jar-with-dependencies.jar single method ./temp/{}.java ./temp/{}_abs.java ./Idioms.csv".format(
+                    self.id, self.id)
+
+                p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True, cwd=abstraction_jar)
+                output = p.stdout.read()
+
+                f = open(os.path.join(abstraction_folder, "{}_abs.java".format(self.id)), "r")
+                self.abstract=f.read()
+                f.close()
+
+                f = open(os.path.join(abstraction_folder, "{}_abs.java.map".format(self.id)), "r")
+                self.dict_abstract=f.read()
+                f.close()
+
+            except Exception as e:
+                self.log.error("Error abstraction method {}".format(self.id))
+                self.abstraction_ok=False
+
+
+    def write_method(self, destination_folder):
+        f = codecs.open(os.path.join(destination_folder, "{}.java".format(self.id)), "w+")
+        f.write(self.text)
+        f.close()
+
 
     def add_conditions(self):
 

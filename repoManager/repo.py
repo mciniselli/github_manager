@@ -5,7 +5,7 @@ from repoManager.file import File
 
 
 class Repo:
-    def __init__(self, repository_name: str, repository_url: str, commit: str, id: int):
+    def __init__(self, repository_name: str, repository_url: str, commit: str, id: int, abstract: bool = False):
         self.id=id
         self.repository_name = repository_name
         self.repository_url = repository_url
@@ -16,6 +16,7 @@ class Repo:
         self.cloned_directory = None
         self.version=""
         self.is_tag=""
+        self.abstract=abstract
 
     def clone_repo(self, base_path: str):
         self.base_path = base_path
@@ -52,10 +53,15 @@ class Repo:
 
         files = self.get_list_of_files(self.cloned_directory)
         java_files = [os.path.join(os.getcwd(), f) for f in files if f.endswith(".java")]
-        for i, f in enumerate(java_files): # passare un indice
-            file = File(f, i)
+        for i, f in enumerate(java_files):
+
+            file = File(f, i, self.abstract)
+            file.create_abstraction_folder()
+
             file.add_methods()
             self.files.append(file)
+
+            file.remove_abstraction_folder()
 
         # print(self.files[0].filename)
         # self.files[0].add_methods()
