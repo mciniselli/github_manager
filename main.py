@@ -580,6 +580,20 @@ def test_src2abs():
 
     print(datetime.now())
 
+def method_nested():
+    from repoManager.repo import Repo
+    r = Repo("a", "b", "c", 1000, True)
+    r.cloned_directory="test/method_nested"
+    r.add_files()
+
+    for f in r.files:
+        for m in f.methods:
+            m.check_conditions()
+
+    from repoManager.store import Store
+
+    store = Store()
+    store.export_data(r)
 
 if __name__=="__main__":
     init_global("logger.log")
@@ -589,8 +603,9 @@ if __name__=="__main__":
     # test_merge_tree()
     # test_equal()
     # test()
-    process_json_file()
+    # process_json_file()
     # test_remove()
     # test_add_tag()
     # tt()
     # test_src2abs()
+    method_nested()
