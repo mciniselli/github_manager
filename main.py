@@ -66,7 +66,16 @@ def process_json_file(filepath: str, start: int, end: int, do_abstraction: bool 
     print(datetime.now())
 
 
+def analyse_results():
+    from result_analysis.analysis import Analysis
 
+    a = Analysis()
+
+    a.count_repos()
+    result, result_global=a.count_file_and_method()
+
+    print(result)
+    print(result_global)
 
 
 if __name__=="__main__":
@@ -86,9 +95,16 @@ if __name__=="__main__":
     parser.add_argument("-c", "--conditions", action="store_true",
                         help="clone the repositories in the json @filepath and check for all conditions")
 
-    parser.add_argument("-a", "--do_abstraction", action="store_true",
+    parser.add_argument("-a", "--analysis", action="store_true",
+                        help="analyze the results")
+
+    parser.add_argument("-abs", "--do_abstraction", action="store_true",
                         help="abstract methods during condition processing")
     args = parser.parse_args()
 
     if args.conditions:
+        # -c -s 4 -e 7 -f json_data/results.json
         process_json_file(args.filepath, args.start, args.end, args.do_abstraction)
+
+    if args.analysis:
+        analyse_results()

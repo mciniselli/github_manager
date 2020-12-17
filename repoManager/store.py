@@ -52,7 +52,7 @@ class FileManager:
 
     def read_file_txt(self):
         try:
-            self.open_file(self.file_path, "r")
+            self.open_file_txt(self.file_path, "r")
 
             content = self.file.readlines()
             c_ = list()
@@ -66,6 +66,26 @@ class FileManager:
         finally:
             self.close_file()
         return c_
+
+    def read_csv(self):
+        dict_result=dict()
+        with open(self.file_path, mode='r') as csv_file:
+            csv_reader = csv.DictReader(csv_file)
+            line_count = 0
+            for row in csv_reader:
+                if line_count == 0:
+
+                    for r in row:
+                        dict_result[r]=list()
+                        dict_result[r].append(row[r])
+
+                    line_count += 1
+                else:
+                    for r in row:
+                        dict_result[r].append(row[r])
+                    line_count += 1
+
+        return dict_result
 
     def write_file_txt(self, element):  # write generic file
 
