@@ -48,28 +48,32 @@ class Method():
             pass
 
         if abstraction:
-            try:
-                abstraction_folder = "abstraction/temp"
-                abstraction_jar = "abstraction"
-                self.write_method(abstraction_folder)
+            self.abstract_method()
 
-                cmd = "java -jar src2abs-0.1-jar-with-dependencies.jar single method ./temp/{}.java ./temp/{}_abs.java ./Idioms.csv".format(
-                    self.id, self.id)
 
-                p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True, cwd=abstraction_jar)
-                output = p.stdout.read()
+    def abstract_method(self):
+        try:
+            abstraction_folder = "abstraction/temp"
+            abstraction_jar = "abstraction"
+            self.write_method(abstraction_folder)
 
-                f = open(os.path.join(abstraction_folder, "{}_abs.java".format(self.id)), "r")
-                self.abstract = f.read()
-                f.close()
+            cmd = "java -jar src2abs-0.1-jar-with-dependencies.jar single method ./temp/{}.java ./temp/{}_abs.java ./Idioms.csv".format(
+                self.id, self.id)
 
-                f = open(os.path.join(abstraction_folder, "{}_abs.java.map".format(self.id)), "r")
-                self.dict_abstract = f.read()
-                f.close()
+            p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True, cwd=abstraction_jar)
+            output = p.stdout.read()
 
-            except Exception as e:
-                self.log.error("Error abstraction method {}".format(self.id))
-                self.abstraction_ok = False
+            f = open(os.path.join(abstraction_folder, "{}_abs.java".format(self.id)), "r")
+            self.abstract = f.read()
+            f.close()
+
+            f = open(os.path.join(abstraction_folder, "{}_abs.java.map".format(self.id)), "r")
+            self.dict_abstract = f.read()
+            f.close()
+
+        except Exception as e:
+            self.log.error("Error abstraction method {}".format(self.id))
+            self.abstraction_ok = False
 
     def count_lines(self):
         '''

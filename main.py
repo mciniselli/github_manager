@@ -65,6 +65,49 @@ def process_json_file(filepath: str, start: int, end: int, do_abstraction: bool 
 
     print(datetime.now())
 
+def abstract_mined_repos(min_token: int = 0, max_token: int = 9999999, min_line: int = 0,
+                              max_line: int = 9999999):
+    from repoManager.store import FileManager
+    from abstraction.abstraction import Abstraction
+    f = FileManager("export/repo_info.csv")
+    repo_dict = f.read_csv()
+
+    repos_name = repo_dict["NAME"]
+    repos_id = repo_dict["ID"]
+
+    for id, name in zip(repos_id, repos_name):
+        f = FileManager("export/{}/file_info.csv".format(id))
+        file_dict = f.read_csv()
+
+        if len(file_dict.keys()) == 0:
+            continue
+
+        file_ids = file_dict["ID"]
+
+        for file_id in file_ids:
+            f = FileManager("export/{}/{}/method_info.csv".format(id, file_id))
+            method_dict = f.read_csv()
+
+            if len(method_dict.keys()) == 0:
+                continue
+
+            method_ids = method_dict["ID"]
+            method_num_tokens = method_dict["NUM_TOKENS"]
+            method_num_lines = method_dict["NUM_LINES"]
+            method_nested = method_dict["HAS_NESTED_METHOD"]
+
+            for method_id, num_tokens, num_lines, nested in zip(method_ids, method_num_tokens, method_num_lines,
+                                                                method_nested):
+                num_tokens = int(num_tokens)
+                num_lines = int(num_lines)
+                if nested == True:
+                    continue
+                if num_tokens >= min_token and num_tokens <= max_token:
+                    if num_lines >= min_line and num_lines <= max_line:
+                        # java_file="./export/{}/{}/{}/source.java".format()
+                        a=Abstraction(java_file)
+
+
 
 def analyse_results():
     from result_analysis.analysis import Analysis
