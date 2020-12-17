@@ -23,14 +23,14 @@ class FileManager:
         self.file_path = file_path
         self.log = settings.logger
 
-    def open_file_csv(self, mode: str, fieldnames: List[str]):
+    def open_file_csv(self, mode: str, fieldnames: List[str], force_write_header: bool = False):
         write_header=True
         if os.path.exists(self.file_path):
             write_header=False
         self.file = open(self.file_path, mode=mode, encoding="utf-8")
         self.fieldnames = fieldnames
         self.writer = csv.DictWriter(self.file, fieldnames=self.fieldnames)
-        if write_header:
+        if write_header or force_write_header:
             self.writer.writeheader()
 
     def example(self):
