@@ -69,6 +69,10 @@ def process_json_file(filepath: str, start: int, end: int, do_abstraction: bool 
 
 def abstract_mined_repos(min_token: int = 0, max_token: int = 9999999, min_line: int = 0,
                               max_line: int = 9999999):
+
+    import utils.settings as settings
+    log = settings.logger
+
     f = FileManager("export/repo_info.csv")
     repo_dict = f.read_csv()
 
@@ -87,6 +91,8 @@ def abstract_mined_repos(min_token: int = 0, max_token: int = 9999999, min_line:
 
         file_ids = file_dict["ID"]
 
+        log.info("logging repo {} - {}".format(id, name))
+
         for file_id in file_ids:
             method_path="export/{}/{}/method_info.csv".format(id, file_id)
             f = FileManager(method_path)
@@ -99,15 +105,32 @@ def abstract_mined_repos(min_token: int = 0, max_token: int = 9999999, min_line:
             method_num_tokens = method_dict["NUM_TOKENS"]
             method_num_lines = method_dict["NUM_LINES"]
             method_nested = method_dict["HAS_NESTED_METHOD"]
+            abstraction_required=method_dict["ABSTRACTION_REQUIRED"]
+            abstraction_ok = method_dict["ABSTRACTION_OK"]
 
             abstraction_result=list()
             method_to_abstract=list()
 
-            for method_id, num_tokens, num_lines, nested in zip(method_ids, method_num_tokens, method_num_lines,
-                                                                method_nested):
+            log.info("logging file {}".format(file_id))
+
+            for method_id, num_tokens, num_lines, nested, already_required, is_abs_ok in zip(method_ids, method_num_tokens, method_num_lines,
+                                                                method_nested, abstraction_required, abstraction_ok):
+
+
+
+                if already_required=='True':
+                    abstraction_result.append(is_abs_ok)
+                    method_to_abstract.append(already_required)
+                    log.info("method {} already abstracted".format(method_id))
+                    continue
+
                 num_tokens = int(num_tokens)
                 num_lines = int(num_lines)
-                if nested == True:
+                if nested == "True":
+                    abstraction_result.append(str(True))
+                    method_to_abstract.append(str(False))
+                    log.info("method {} is nested".format(method_id))
+
                     continue
                 if num_tokens >= min_token and num_tokens <= max_token and num_lines >= min_line and num_lines <= max_line:
                     java_file="./export/{}/{}/{}/source.java".format(id, file_id, method_id)
@@ -116,9 +139,13 @@ def abstract_mined_repos(min_token: int = 0, max_token: int = 9999999, min_line:
                     res=a.abstract_method()
                     abstraction_result.append(str(res))
                     method_to_abstract.append(str(True))
+                    log.info("method {} abstracted".format(method_id))
+
                 else:
                     abstraction_result.append(str(True))
                     method_to_abstract.append(str(False))
+                    log.info("method {} will not be abstracted")
+
 
             update_method(method_dict, method_path, method_field, abstraction_result, method_to_abstract)
 
@@ -167,7 +194,7 @@ def analyse_results():
     print(result)
     print(result_global)
 
-    abstract_mined_repos(0, 100, 5, 10)
+    abstract_mined_repos(0, 100, 5, 15)
 
 
 if __name__=="__main__":
