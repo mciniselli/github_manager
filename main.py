@@ -74,9 +74,6 @@ def analyse_results(parameter):
     a = Analysis()
 
     a.count_repos()
-    result, result_global=a.count_file_and_method()
-    print(result)
-    print(result_global)
 
     result, result_global=a.count_file_and_method(*parameter)
     print(result)
@@ -84,7 +81,7 @@ def analyse_results(parameter):
 
 def abstract_results(parameter):
     abstraction_class=AbstractionManager(0, 100, 5, 15)
-    abstraction_class.abstract_mined_repos()
+    abstraction_class.abstract_mined_repos(*parameter)
 
 def main():
     init_global("logger.log")
