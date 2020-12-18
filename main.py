@@ -81,7 +81,7 @@ def analyse_results(parameter):
 
 def abstract_results(parameter):
     abstraction_class=AbstractionManager(0, 100, 5, 15)
-    abstraction_class.abstract_mined_repos(*parameter)
+    abstraction_class.abstract_mined_repos()
 
 def main():
     init_global("logger.log")
