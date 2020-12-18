@@ -1,0 +1,1 @@
+public VAR_1 ( TYPE_1 context , TYPE_2 VAR_2 ) { super ( context , VAR_2 ) ; }

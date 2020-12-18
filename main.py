@@ -2,8 +2,7 @@
 import json
 
 import argparse
-from repoManager.store import FileManager
-from abstraction.abstraction import Abstraction
+from abstraction.abstraction import AbstractionManager
 
 from utils.settings import init_global
 
@@ -67,120 +66,9 @@ def process_json_file(filepath: str, start: int, end: int, do_abstraction: bool 
 
     print(datetime.now())
 
-def abstract_mined_repos(min_token: int = 0, max_token: int = 9999999, min_line: int = 0,
-                              max_line: int = 9999999):
-
-    import utils.settings as settings
-    log = settings.logger
-
-    f = FileManager("export/repo_info.csv")
-    repo_dict = f.read_csv()
-
-    repos_name = repo_dict["NAME"]
-    repos_id = repo_dict["ID"]
-
-    method_field = ["ID", "START", "END", "NUM_CONDITION", "NUM_CONDITION_OK", "ABSTRACTION_REQUIRED",
-                     "ABSTRACTION_OK", "NUM_TOKENS", "NUM_LINES", "HAS_NESTED_METHOD"]
-
-    for id, name in zip(repos_id, repos_name):
-        f = FileManager("export/{}/file_info.csv".format(id))
-        file_dict = f.read_csv()
-
-        if len(file_dict.keys()) == 0:
-            continue
-
-        file_ids = file_dict["ID"]
-
-        log.info("logging repo {} - {}".format(id, name))
-
-        for file_id in file_ids:
-            method_path="export/{}/{}/method_info.csv".format(id, file_id)
-            f = FileManager(method_path)
-            method_dict = f.read_csv()
-
-            if len(method_dict.keys()) == 0:
-                continue
-
-            method_ids = method_dict["ID"]
-            method_num_tokens = method_dict["NUM_TOKENS"]
-            method_num_lines = method_dict["NUM_LINES"]
-            method_nested = method_dict["HAS_NESTED_METHOD"]
-            abstraction_required=method_dict["ABSTRACTION_REQUIRED"]
-            abstraction_ok = method_dict["ABSTRACTION_OK"]
-
-            abstraction_result=list()
-            method_to_abstract=list()
-
-            log.info("logging file {}".format(file_id))
-
-            for method_id, num_tokens, num_lines, nested, already_required, is_abs_ok in zip(method_ids, method_num_tokens, method_num_lines,
-                                                                method_nested, abstraction_required, abstraction_ok):
 
 
-
-                if already_required=='True':
-                    abstraction_result.append(is_abs_ok)
-                    method_to_abstract.append(already_required)
-                    log.info("method {} already abstracted".format(method_id))
-                    continue
-
-                num_tokens = int(num_tokens)
-                num_lines = int(num_lines)
-                if nested == "True":
-                    abstraction_result.append(str(True))
-                    method_to_abstract.append(str(False))
-                    log.info("method {} is nested".format(method_id))
-
-                    continue
-                if num_tokens >= min_token and num_tokens <= max_token and num_lines >= min_line and num_lines <= max_line:
-                    java_file="./export/{}/{}/{}/source.java".format(id, file_id, method_id)
-                    print(java_file)
-                    a=Abstraction(java_file)
-                    res=a.abstract_method()
-                    abstraction_result.append(str(res))
-                    method_to_abstract.append(str(True))
-                    log.info("method {} abstracted".format(method_id))
-
-                else:
-                    abstraction_result.append(str(True))
-                    method_to_abstract.append(str(False))
-                    log.info("method {} will not be abstracted")
-
-
-            update_method(method_dict, method_path, method_field, abstraction_result, method_to_abstract)
-
-
-
-
-def update_method(method_dict, method_path, method_field, abstraction_result, method_to_abstract):
-    m = FileManager(method_path)
-
-    # we want to force the creation of the header (the file already exists so we'll skip the header otherwise)
-    m.open_file_csv("w+", method_field, force_write_header=True)
-
-
-    num_methods=len(method_dict["ID"])
-
-    for i in range(num_methods):
-
-        values_method=list()
-        for field in method_field:
-            values_method.append(method_dict[field][i])
-
-        values_method[5]=str(method_to_abstract[i])
-        values_method[6]=str(abstraction_result[i])
-
-
-
-        dict_row = dict()
-        for x, y in zip(method_field, values_method):
-            dict_row[x] = y
-
-        m.write_file_csv(dict_row)
-
-    m.close_file()
-
-def analyse_results():
+def analyse_results(parameter):
     from result_analysis.analysis import Analysis
 
     a = Analysis()
@@ -190,14 +78,15 @@ def analyse_results():
     print(result)
     print(result_global)
 
-    result, result_global=a.count_file_and_method(0, 100, 5, 10)
+    result, result_global=a.count_file_and_method(*parameter)
     print(result)
     print(result_global)
 
-    abstract_mined_repos(0, 100, 5, 15)
+def abstract_results(parameter):
+    abstraction_class=AbstractionManager(0, 100, 5, 15)
+    abstraction_class.abstract_mined_repos()
 
-
-if __name__=="__main__":
+def main():
     init_global("logger.log")
 
     parser = argparse.ArgumentParser()
@@ -217,13 +106,44 @@ if __name__=="__main__":
     parser.add_argument("-a", "--analysis", action="store_true",
                         help="analyze the results")
 
-    parser.add_argument("-abs", "--do_abstraction", action="store_true",
+    parser.add_argument("-do_abstraction_during_check", "--do_abstraction_during_check", action="store_true",
                         help="abstract methods during condition processing")
+
+    parser.add_argument("-abs", "--abstract", action="store_true",
+                        help="abstract methods based on repo_info.csv and parameters (see --parameter)")
+
+    parser.add_argument("-p", "--parameter", type=str, default="0_9999999_0_9999999",
+                        help="default parameters for analysis and abstraction. You have to write min number of tokens, max number of tokens,"
+                             "min number of lines and max number of lines, separated by a underscore(_). If you do not want to specify"
+                             "one of the parameters, put None")
+
     args = parser.parse_args()
 
     if args.conditions:
         # -c -s 4 -e 7 -f json_data/results.json
-        process_json_file(args.filepath, args.start, args.end, args.do_abstraction)
+        process_json_file(args.filepath, args.start, args.end, args.do_abstraction_during_check)
+
+    parameter_input = args.parameter.split("_")
+    if len(parameter_input) != 4:
+        print("ERROR: NUMBER OF PARAMETER IS NOT CORRECT")
+        return
+
+    parameter_default=[0, 9999999, 0, 9999999]
+    parameter_list=list()
+
+    for default, value in zip(parameter_default, parameter_input):
+        if value.lower() == "none":
+            parameter_list.append(default)
+            continue
+
+        curr=int(value)
+        parameter_list.append(curr)
 
     if args.analysis:
-        analyse_results()
+        analyse_results(parameter_list)
+
+    if args.abstract:
+        abstract_results(parameter_list)
+
+if __name__=="__main__":
+    main()
