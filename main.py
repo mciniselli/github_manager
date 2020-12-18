@@ -80,7 +80,7 @@ def analyse_results(parameter):
     print(result_global)
 
 def abstract_results(parameter):
-    abstraction_class=AbstractionManager(0, 100, 5, 15)
+    abstraction_class=AbstractionManager(*parameter)
     abstraction_class.abstract_mined_repos()
 
 def main():
