@@ -3,6 +3,7 @@ import json
 
 import argparse
 from abstraction.abstraction import AbstractionManager
+from dataset_creation.dataset_mining import DatasetMining
 
 from utils.settings import init_global
 
@@ -83,6 +84,10 @@ def abstract_results(parameter):
     abstraction_class=AbstractionManager(*parameter)
     abstraction_class.abstract_mined_repos()
 
+def export_query(parameter):
+    dataset_mining=DatasetMining(*parameter)
+    dataset_mining.export_dataset_sql()
+
 def main():
     init_global("logger.log")
 
@@ -108,6 +113,10 @@ def main():
 
     parser.add_argument("-abs", "--abstract", action="store_true",
                         help="abstract methods based on repo_info.csv and parameters (see --parameter)")
+
+
+    parser.add_argument("-exp", "--export_query", action="store_true",
+                        help="export all methods in a sql file")
 
     parser.add_argument("-p", "--parameter", type=str, default="0_9999999_0_9999999",
                         help="default parameters for analysis and abstraction. You have to write min number of tokens, max number of tokens,"
@@ -140,7 +149,12 @@ def main():
         analyse_results(parameter_list)
 
     if args.abstract:
+        #-abs -p 0_100_5_15
         abstract_results(parameter_list)
+
+    if args.export_query:
+        #-exp -p 0_100_5_15
+        export_query(parameter_list)
 
 if __name__=="__main__":
     main()

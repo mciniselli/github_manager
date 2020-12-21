@@ -1,7 +1,7 @@
 from subprocess import Popen, PIPE, STDOUT
 from repoManager.store import FileManager
 import utils.settings as settings
-
+import codecs
 
 class Abstraction:
     def __init__(self, java_file):
@@ -9,6 +9,7 @@ class Abstraction:
 
         path = self.java_file.split("/")[:-1]
         self.java_abs_file = "/".join(path) + "/abstract.java"
+        self.tokens_path="/".join(path) + "/tokens.txt"
 
         print(self.java_file)
         print(self.java_abs_file)
@@ -26,6 +27,76 @@ class Abstraction:
         except Exception as e:
             return False
 
+    def read_file_txt(self, file_path):
+        file = None
+        try:
+            file=codecs.open(file_path, mode='r', encoding="utf-8")
+
+            content = file.readlines()
+            c_ = list()
+            for c in content:
+                r = c.rstrip("\n").rstrip("\r")
+                c_.append(r)
+
+        except Exception as e:
+            c_ = []
+        finally:
+            file.close()
+        return c_
+
+    def write_tokens(self, element):  # write generic file
+
+        file = None
+        try:
+            file=codecs.open(self.tokens_path, mode='w+', encoding="utf-8")
+            file.write(element)
+
+        except Exception as e:
+            c_ = []
+        finally:
+            file.close()
+
+
+    def process_map(self, filename):  # write map file in a better way
+
+        lines = list()
+        with codecs.open(filename, "r", "utf-8") as fp:
+            for line in fp:
+                # print(line)
+                if len(line.strip()) > 0:
+                    lines.append(line.strip())
+
+        lines_type = list()
+        lines_value = list()
+
+        for i, line in enumerate(lines):
+            if i % 2 == 0:
+                lines_value.append(line)
+            else:
+                lines_type.append(line)
+        result=dict()
+
+        for a, b in zip(lines_type, lines_value):
+            types = a.split(",")
+            values = b.split(",")
+            for a_, b_ in zip(types, values):
+                if len(a_) > 0:
+                    result[a_] = b_
+        return result
+
+
+    def save_list_of_tokens(self):
+        abstract_file=self.read_file_txt(self.java_abs_file)[0]
+        abstract_map_file=self.process_map(self.java_abs_file+".map")
+        abstract_tokens=abstract_file.split(" ")
+        raw_tokens=list()
+        for t in abstract_tokens:
+            if t in abstract_map_file.keys():
+                raw_tokens.append(abstract_map_file[t])
+            else:
+                raw_tokens.append(t)
+
+        self.write_tokens(str(raw_tokens))
 
 class AbstractionManager:
     def __init__(self, min_tokens: int = 0, max_tokens: int = 9999999, min_lines: int = 0, max_lines: int = 9999999):
@@ -104,6 +175,7 @@ class AbstractionManager:
                         print(java_file)
                         a = Abstraction(java_file)
                         res = a.abstract_method()
+                        a.save_list_of_tokens()
                         abstraction_result.append(str(res))
                         method_to_abstract.append(str(True))
                         self.log.info("method {} abstracted".format(method_id))

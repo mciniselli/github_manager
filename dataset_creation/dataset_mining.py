@@ -17,16 +17,16 @@ class DatasetMining:
         id_file INT NOT NULL,
         id_method INT NOT NULL,
         code MEDIUMTEXT NOT NULL,
-        abstract_code MEDIUMTEXT NOT NULL
+        code_tokens MEDIUMTEXT NOT NULL,
+        abstract_code MEDIUMTEXT NOT NULL,
         abstract_representation MEDIUMTEXT NOT NULL,
         repo_name nvarchar(256) NOT NULL,
         repo_url MEDIUMTEXT NOT NULL,
-        repo_commit nvarchar(30) NOT NULL,
-        num_files INT NOT NULL,
-        filename MEDIUMTEXT NOT NULL,
+        repo_commit nvarchar(60) NOT NULL,
+        file_name MEDIUMTEXT NOT NULL,
         num_methods INT NOT  NULL,
-        start nvarchar(10) NOT NULL,
-        end nvarchar(10) NOT NULL,
+        start_method nvarchar(10) NOT NULL,
+        end_method nvarchar(10) NOT NULL,
         num_tokens INT NOT NULL,
         num_lines INT NOT NULL
         );
@@ -37,29 +37,69 @@ class DatasetMining:
         pass
 
     def format_string(self, code):
-        code.replace("\\", "\\\\").replace("'", "\\'")
-        return "'{}'".format(code)
+        code_new=code.replace("\\", "\\\\").replace("'", "\\'").replace("\n", "\\n    ")
+        return "'{}'".format(code_new)
 
+
+    def export_query_to_file(self, filename):
+        file=codecs.open(filename, "w+", "utf-8")
+        for q in self.query:
+            file.write(q+"\n")
+        file.close()
 
     def read_file_txt(self, file_path):
         file = None
         try:
-            file=codecs.open(file_path, mode='r', encoding="utf-8")
+            with codecs.open(file_path, mode='r', encoding="utf-8") as file:
 
-            content = file.readlines()
-            c_ = list()
-            for c in content:
-                r = c.rstrip("\n").rstrip("\r")
-                c_.append(r)
+                content = file.readlines()
+                c_ = list()
+                for c in content:
+                    r = c.rstrip("\n").rstrip("\r")
+                    c_.append(r)
 
         except Exception as e:
             c_ = []
-        finally:
-            file.close()
         return c_
 
+    def update_queries(self, rows):
+        new_rows=list()
+        for records in rows:
+            new_rows.append("( {} )".format(", ".join(records)))
 
-    def export_dataset_sql(self):
+        query="INSERT INTO method (id_repo, id_file, id_method, code, code_tokens, abstract_code, abstract_representation, repo_name, repo_url," \
+              "repo_commit, file_name, num_methods, start_method, end_method, num_tokens, num_lines) VALUES {} ;".format(", ".join(new_rows))
+
+        self.query.append (query +'\n')
+
+    def process_map(self, filename):  # write map file in a better way
+
+        lines = list()
+        with codecs.open(filename, "r", "utf-8") as fp:
+            for line in fp:
+                # print(line)
+                if len(line.strip()) > 0:
+                    lines.append(line.strip())
+
+        lines_type = list()
+        lines_value = list()
+
+        for i, line in enumerate(lines):
+            if i % 2 == 0:
+                lines_value.append(line)
+            else:
+                lines_type.append(line)
+        result=list()
+
+        for a, b in zip(lines_type, lines_value):
+            types = a.split(",")
+            values = b.split(",")
+            for a_, b_ in zip(types, values):
+                if len(a_) > 0:
+                    result.append(a_ + ": " + b_)
+        return str(result)
+
+    def export_dataset_sql(self, num_per_query=100):
         f = FileManager("export/repo_info.csv")
         repo_dict = f.read_csv()
 
@@ -119,24 +159,35 @@ class DatasetMining:
                         java_file = "./export/{}/{}/{}/source.java".format(id, file_id, method_id)
                         abstract_file = "./export/{}/{}/{}/abstract.java".format(id, file_id, method_id)
                         map_file = "./export/{}/{}/{}/abstract.java.map".format(id, file_id, method_id)
+                        code_tokens = "./export/{}/{}/{}/tokens.txt".format(id, file_id, method_id)
+
 
                         row=list()
-                        row.append(id)
-                        row.append(file_id)
-                        row.append(method_id)
-                        row.append(self.format_string( "\n".format(self.read_file_txt(java_file))))
-                        row.append(self.format_string( "\n".format(self.read_file_txt(abstract_file))))
-                        row.append(self.format_string( "\n".format(self.read_file_txt(map_file))))
+                        row.append(str(id))
+                        row.append(str(file_id))
+                        row.append(str(method_id))
+                        row.append(self.format_string( "\n".join(self.read_file_txt(java_file))))
+                        row.append(self.format_string( "\n".join(self.read_file_txt(code_tokens))))
+                        row.append(self.format_string( "\n".join(self.read_file_txt(abstract_file))))
+                        row.append(self.format_string((self.process_map(map_file))))
                         row.append(self.format_string(name))
                         row.append(self.format_string(url))
                         row.append(self.format_string(commit))
+
                         row.append(self.format_string(file_name))
-                        row.append(number_method)
-                        row.append(start)
-                        row.append(end)
-                        row.append(num_tokens)
-                        row.append(num_lines)
+                        row.append(str(number_method))
+                        row.append(self.format_string(start))
+                        row.append(self.format_string(end))
+                        row.append(str(num_tokens))
+                        row.append(str(num_lines))
                         rows.append(row)
 
+                        if len(rows) % num_per_query == 0:
+                            self.update_queries(rows)
+                            rows=list()
 
+        if len(rows) > 0:
+            self.update_queries(rows)
+            rows=list()
 
+        self.export_query_to_file("sample.sql")
