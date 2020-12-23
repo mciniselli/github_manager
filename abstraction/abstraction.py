@@ -2,6 +2,8 @@ from subprocess import Popen, PIPE, STDOUT
 from repoManager.store import FileManager
 import utils.settings as settings
 import codecs
+import shutil
+import os
 
 class Abstraction:
     def __init__(self, java_file):
@@ -10,9 +12,6 @@ class Abstraction:
         path = self.java_file.split("/")[:-1]
         self.java_abs_file = "/".join(path) + "/abstract.java"
         self.tokens_path="/".join(path) + "/tokens.txt"
-
-        print(self.java_file)
-        print(self.java_abs_file)
 
     def abstract_method(self):
         try:
@@ -134,6 +133,9 @@ class AbstractionManager:
                 f = FileManager(method_path)
                 method_dict = f.read_csv()
 
+                if not os.path.exists(method_path+"__BACKUP"):
+                    shutil.copy(method_path, method_path+"__BACKUP")
+
                 if len(method_dict.keys()) == 0:
                     continue
 
@@ -172,7 +174,7 @@ class AbstractionManager:
                         continue
                     if num_tokens >= self.min_tokens and num_tokens <= self.max_tokens and num_lines >= self.min_lines and num_lines <= self.max_lines:
                         java_file = "./export/{}/{}/{}/source.java".format(id, file_id, method_id)
-                        print(java_file)
+                        # print(java_file)
                         a = Abstraction(java_file)
                         res = a.abstract_method()
                         a.save_list_of_tokens()
@@ -183,7 +185,7 @@ class AbstractionManager:
                     else:
                         abstraction_result.append(str(True))
                         method_to_abstract.append(str(False))
-                        self.log.info("method {} will not be abstracted")
+                        self.log.info("method {} will not be abstracted".format(method_id))
 
                 self.update_method(method_dict, method_path, method_field, abstraction_result, method_to_abstract)
 
