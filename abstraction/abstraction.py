@@ -85,17 +85,20 @@ class Abstraction:
 
 
     def save_list_of_tokens(self):
-        abstract_file=self.read_file_txt(self.java_abs_file)[0]
-        abstract_map_file=self.process_map(self.java_abs_file+".map")
-        abstract_tokens=abstract_file.split(" ")
-        raw_tokens=list()
-        for t in abstract_tokens:
-            if t in abstract_map_file.keys():
-                raw_tokens.append(abstract_map_file[t])
-            else:
-                raw_tokens.append(t)
+        try:
+            abstract_file=self.read_file_txt(self.java_abs_file)[0]
+            abstract_map_file=self.process_map(self.java_abs_file+".map")
+            abstract_tokens=abstract_file.split(" ")
+            raw_tokens=list()
+            for t in abstract_tokens:
+                if t in abstract_map_file.keys():
+                    raw_tokens.append(abstract_map_file[t])
+                else:
+                    raw_tokens.append(t)
 
-        self.write_tokens(str(raw_tokens))
+            self.write_tokens(str(raw_tokens))
+        except Exception as e:
+            print("ERROR DURING TOKEN EXTRACTION")
 
 class AbstractionManager:
     def __init__(self, min_tokens: int = 0, max_tokens: int = 9999999, min_lines: int = 0, max_lines: int = 9999999):
@@ -186,8 +189,10 @@ class AbstractionManager:
                         abstraction_result.append(str(True))
                         method_to_abstract.append(str(False))
                         self.log.info("method {} will not be abstracted".format(method_id))
-
-                self.update_method(method_dict, method_path, method_field, abstraction_result, method_to_abstract)
+                try:
+                    self.update_method(method_dict, method_path, method_field, abstraction_result, method_to_abstract)
+                except Exception as e:
+                    self.log.info("file {} update FAILED ".format(file_id))
 
     def update_method(self, method_dict, method_path, method_field, abstraction_result, method_to_abstract):
         m = FileManager(method_path)

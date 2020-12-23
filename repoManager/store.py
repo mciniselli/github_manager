@@ -69,22 +69,24 @@ class FileManager:
 
     def read_csv(self):
         dict_result=dict()
-        with open(self.file_path, mode='r') as csv_file:
-            csv_reader = csv.DictReader(csv_file)
-            line_count = 0
-            for row in csv_reader:
-                if line_count == 0:
+        try:
+            with open(self.file_path, mode='r') as csv_file:
+                csv_reader = csv.DictReader(csv_file)
+                line_count = 0
+                for row in csv_reader:
+                    if line_count == 0:
 
-                    for r in row:
-                        dict_result[r]=list()
-                        dict_result[r].append(row[r])
+                        for r in row:
+                            dict_result[r]=list()
+                            dict_result[r].append(row[r])
 
-                    line_count += 1
-                else:
-                    for r in row:
-                        dict_result[r].append(row[r])
-                    line_count += 1
-
+                        line_count += 1
+                    else:
+                        for r in row:
+                            dict_result[r].append(row[r])
+                        line_count += 1
+        except Exception as e:
+            dict_result=dict()
         return dict_result
 
     def write_file_txt(self, element):  # write generic file
