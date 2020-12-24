@@ -1,9 +1,10 @@
 from repoManager.store import FileManager
 
+import utils.settings as settings
 
 class Analysis:
     def __init__(self):
-        pass
+        self.log = settings.logger
 
     def count_repos(self):
         f = FileManager("export/repo_info.csv")
@@ -22,8 +23,9 @@ class Analysis:
 
         repos_name = repo_dict["NAME"]
         repos_id = repo_dict["ID"]
-
+        self.log.info("start counting of files and methods")
         for id, name in zip(repos_id, repos_name):
+            self.log.info("processed repo {} {}".format(id, name))
             f = FileManager("export/{}/file_info.csv".format(id))
             file_dict = f.read_csv()
 
