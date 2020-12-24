@@ -4,6 +4,7 @@ import json
 import argparse
 from abstraction.abstraction import AbstractionManager
 from dataset_creation.dataset_mining import DatasetMining
+from token_extraction.token_extraction import TokenExtraction
 
 from utils.settings import init_global
 
@@ -105,6 +106,11 @@ def export_query(parameter):
     dataset_mining=DatasetMining(*parameter)
     dataset_mining.export_dataset_sql()
 
+def extract_tokens(parameter):
+    t=TokenExtraction(*parameter)
+    t.tokenized_mined_repos()
+
+
 def main():
     init_global("logger.log")
 
@@ -140,6 +146,9 @@ def main():
                              "min number of lines and max number of lines, separated by a underscore(_). If you do not want to specify"
                              "one of the parameters, put None")
 
+    parser.add_argument("-t", "--tokens", action="store_true",
+                        help="save tokens")
+
     args = parser.parse_args()
 
     if args.conditions:
@@ -172,6 +181,8 @@ def main():
     if args.export_query:
         #-exp -p 0_100_5_15
         export_query(parameter_list)
+    if args.tokens:
+        extract_tokens(parameter_list)
 
 if __name__=="__main__":
     main()
