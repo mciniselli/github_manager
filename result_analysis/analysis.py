@@ -52,8 +52,8 @@ class Analysis:
 
                 for method_id, num_tokens, num_lines, nested in zip(method_ids, method_num_tokens, method_num_lines,
                                                                     method_nested):
-                    num_tokens=int(num_tokens)
-                    num_lines=int(num_lines)
+                    num_tokens = int(num_tokens)
+                    num_lines = int(num_lines)
                     if nested == True:
                         continue
                     if num_tokens >= min_token and num_tokens <= max_token:
@@ -62,16 +62,15 @@ class Analysis:
 
             result[name].append(num_methods_ok)
 
-        result_global=dict()
-        result_global["global"]=list()
+        result_global = dict()
 
-        global_num_files=0
-        global_num_methods=0
+        global_num_files = 0
+        global_num_methods = 0
         for res in result.keys():
-            global_num_files+=result[res][0]
-            global_num_methods+=result[res][1]
+            global_num_files += result[res][0]
+            global_num_methods += result[res][1]
 
-        result_global["global"].append(global_num_files)
-        result_global["global"].append(global_num_methods)
+        result_global["global_file"] = global_num_files
+        result_global["global_method"] = global_num_methods
 
         return result, result_global

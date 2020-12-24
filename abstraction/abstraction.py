@@ -136,11 +136,11 @@ class AbstractionManager:
                 f = FileManager(method_path)
                 method_dict = f.read_csv()
 
-                if not os.path.exists(method_path+"__BACKUP"):
-                    shutil.copy(method_path, method_path+"__BACKUP")
-
                 if len(method_dict.keys()) == 0:
                     continue
+
+                if not os.path.exists(method_path+"__BACKUP"):
+                    shutil.copy(method_path, method_path+"__BACKUP")
 
                 method_ids = method_dict["ID"]
                 method_num_tokens = method_dict["NUM_TOKENS"]

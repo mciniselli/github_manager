@@ -77,6 +77,23 @@ def analyse_results(parameter):
     a.count_repos()
 
     result, result_global=a.count_file_and_method(*parameter)
+
+    from repoManager.store import FileManager
+
+    f=FileManager("analysis.txt")
+    f.open_file_txt("w+")
+    for k in result.keys():
+        f.write_file_txt("{}: {}".format(k, result[k]))
+
+    f.close_file()
+
+    f=FileManager("analysis_global.txt")
+    f.open_file_txt("w+")
+    for k in result_global.keys():
+        f.write_file_txt("{}: {}".format(k, result_global[k]))
+
+    f.close_file()
+
     print(result)
     print(result_global)
 
