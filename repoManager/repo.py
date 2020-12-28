@@ -6,6 +6,9 @@ from repoManager.file import File
 
 class Repo:
     def __init__(self, repository_name: str, repository_url: str, commit: str, id: int, abstract: bool = False):
+        '''
+        this class contains all information about each repo (including the list of all files)
+        '''
         self.id=id
         self.repository_name = repository_name
         self.repository_url = repository_url
@@ -19,6 +22,9 @@ class Repo:
         self.abstract=abstract
 
     def clone_repo(self, base_path: str):
+        '''
+        This function use @GithubHelper to clone the repo and do the checkout to the last tag
+        '''
         self.base_path = base_path
         g = GithubHelper()
         result, message = g.clone(self.repository_name, self.base_path)
@@ -44,6 +50,9 @@ class Repo:
                 self.is_repo_ok = False
 
     def add_files(self):
+        '''
+        this function allows you to add the list of all files
+        '''
 
         # to be REMOVED
         # self.cloned_directory="cloning_folder/packages_apps_Trebuchet"
@@ -67,8 +76,9 @@ class Repo:
         # self.files[0].add_methods()
 
     def get_list_of_files(self, dir_name: str):
-        # create a list of file and sub directories
-        # names in the given directory
+        '''
+        This function retrieves the whole list of files contained in the folder
+        '''
         list_of_file = os.listdir(dir_name)
         all_files = list()
         # Iterate over all the entries

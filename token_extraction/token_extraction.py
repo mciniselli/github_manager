@@ -7,6 +7,14 @@ from bs4 import BeautifulSoup
 
 class TokenExtraction:
     def __init__(self, min_tokens: int = 0, max_tokens: int = 9999999, min_lines: int = 0, max_lines: int = 9999999):
+        '''
+        this function allows you to extract and store the list of tokens of the method in tokens.txt file
+        We can pass the minimum and maximum number of tokens and lines to skip methods that do not fulfill this requirement
+        e.g.
+        t=TokenExtraction()
+        t.tokenized_mined_repos()
+
+        '''
         self.min_tokens = min_tokens
         self.max_tokens = max_tokens
         self.min_lines = min_lines
@@ -32,7 +40,9 @@ class TokenExtraction:
         return c_
 
     def write_tokens(self, tokens_path, element):  # write generic file
-
+        '''
+        This function write the list of tokens in tokens.txt file
+        '''
         file = None
         try:
             file = codecs.open(tokens_path, mode='w+', encoding="utf-8")
@@ -44,7 +54,10 @@ class TokenExtraction:
             file.close()
 
     def tokenized_mined_repos(self):
-
+        '''
+        this function uses the csv exported to retrieve all methods fulfilling the number of tokens and lines condition
+        and extract the list of tokens from all of them
+        '''
         f = FileManager("export/repo_info.csv")
         repo_dict = f.read_csv()
 
@@ -105,6 +118,11 @@ class TokenExtraction:
                         self.log.info("tokens for method {}/{}/{} written".format(id, file_id, method_id))
 
     def extract_list_of_tokens(self, node: bs4.element.Tag):
+        '''
+        this function parse the bs4 object to extract the list of all tokens
+        We decided not to consider the spaces as a token
+
+        '''
         result = list()
         index_local = 0
         for c in node.recursiveChildGenerator():

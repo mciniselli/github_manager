@@ -7,6 +7,9 @@ import shutil
 
 class File:
     def __init__(self, filename: str, id: int, abstract: bool = False):
+        '''
+        this class represents a File. It contains all information about the file itself (included the list of methods)
+        '''
         self.methods = list()
         self.filename = filename
         self.id=id
@@ -21,6 +24,9 @@ class File:
         shutil.rmtree("abstraction/temp", ignore_errors=True)
 
     def add_methods(self):
+        '''
+        this function adds all methods contained in the file
+        '''
         s = SrcmlManager()
         s.process_with_srcml(self.filename)
         xml_code = s.get_xml()
@@ -32,11 +38,3 @@ class File:
             meth = Method(m, i, self.abstract)
             meth.add_conditions()
             self.methods.append(meth)
-
-        # method=methods[0]
-        # tokens=method.extract_list_of_tokens(method.xml)
-        # for t in tokens:
-        #     print(repr(t))
-        #
-        #
-        # method.add_conditions()

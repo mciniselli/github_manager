@@ -7,6 +7,9 @@ import utils.settings as settings
 
 class Condition:
     def __init__(self, condition: bs4.element.ResultSet, id: int):
+        '''
+        this class allows you to deal with conditions. We save the bs4 object, the raw xml code and the text
+        '''
         self.condition=condition
         self.raw_code=condition.__str__()
         self.text=condition.text
@@ -45,7 +48,9 @@ class Condition:
 
 
     def check_condition(self):
-
+        '''
+        this function calls a SrcmlFilter function to classify it in one of the categories we are interested into
+        '''
         f=SrcmlFilters(self.condition)
 
         self.srcml_filter=f

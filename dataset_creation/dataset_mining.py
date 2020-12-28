@@ -1,17 +1,15 @@
-
 from repoManager.store import FileManager
 import codecs
 
+
 class DatasetMining:
     def __init__(self, min_tokens: int = 0, max_tokens: int = 9999999, min_lines: int = 0, max_lines: int = 9999999):
-        self.min_tokens = min_tokens
-        self.max_tokens = max_tokens
-        self.min_lines = min_lines
-        self.max_lines = max_lines
-        self.query=list()
-
         '''
-        
+        This class allows you to create the sql method table. It contains information about method (e.g. code, abstract_code)
+        If you do not have abstracted method, the abstract column will be empty
+        You can generate tokens via abstraction or via tokex_extraction.py file.
+        The schema for the database is the following:
+
         CREATE TABLE IF NOT EXISTS method (
         id_repo INT NOT NULL,
         id_file INT NOT NULL,
@@ -30,25 +28,33 @@ class DatasetMining:
         num_tokens INT NOT NULL,
         num_lines INT NOT NULL
         );
-        
         '''
-
-    def add_records_to_sql(self, fields, records):
-        pass
+        self.min_tokens = min_tokens
+        self.max_tokens = max_tokens
+        self.min_lines = min_lines
+        self.max_lines = max_lines
+        self.query = list()
 
     def format_string(self, code):
-        code_new=code.replace("\\", "\\\\").replace("'", "\\'").replace("\n", "\\n    ")
+        '''
+        format string removing all char that should give problem if imported in sql
+        '''
+        code_new = code.replace("\\", "\\\\").replace("'", "\\'").replace("\n", "\\n    ")
         return "'{}'".format(code_new)
 
-
     def export_query_to_file(self, filename):
-        file=codecs.open(filename, "w+", "utf-8")
+        '''
+        write the query into @filename
+        '''
+        file = codecs.open(filename, "w+", "utf-8")
         for q in self.query:
-            file.write(q+"\n")
+            file.write(q + "\n")
         file.close()
 
     def read_file_txt(self, file_path):
-        file = None
+        '''
+        read the file @file_path
+        '''
         try:
             with codecs.open(file_path, mode='r', encoding="utf-8") as file:
 
@@ -63,43 +69,57 @@ class DatasetMining:
         return c_
 
     def update_queries(self, rows):
-        new_rows=list()
+        '''
+        create a new query for the entries in @rows and append it to @self.query
+        '''
+        new_rows = list()
         for records in rows:
             new_rows.append("( {} )".format(", ".join(records)))
 
-        query="INSERT INTO method (id_repo, id_file, id_method, code, code_tokens, abstract_code, abstract_representation, repo_name, repo_url," \
-              "repo_commit, file_name, num_methods, start_method, end_method, num_tokens, num_lines) VALUES {} ;".format(", ".join(new_rows))
+        query = "INSERT INTO method (id_repo, id_file, id_method, code, code_tokens, abstract_code, abstract_representation, repo_name, repo_url," \
+                "repo_commit, file_name, num_methods, start_method, end_method, num_tokens, num_lines) VALUES {} ;".format(
+            ", ".join(new_rows))
 
-        self.query.append (query +'\n')
+        self.query.append(query + '\n')
 
     def process_map(self, filename):  # write map file in a better way
+        '''
+        read the mapping generated during abstraction and format it in a more readable way
+        '''
+        try:
+            lines = list()
+            with codecs.open(filename, "r", "utf-8") as fp:
+                for line in fp:
+                    # print(line)
+                    if len(line.strip()) > 0:
+                        lines.append(line.strip())
 
-        lines = list()
-        with codecs.open(filename, "r", "utf-8") as fp:
-            for line in fp:
-                # print(line)
-                if len(line.strip()) > 0:
-                    lines.append(line.strip())
+            lines_type = list()
+            lines_value = list()
 
-        lines_type = list()
-        lines_value = list()
+            for i, line in enumerate(lines):
+                if i % 2 == 0:
+                    lines_value.append(line)
+                else:
+                    lines_type.append(line)
+            result = list()
 
-        for i, line in enumerate(lines):
-            if i % 2 == 0:
-                lines_value.append(line)
-            else:
-                lines_type.append(line)
-        result=list()
-
-        for a, b in zip(lines_type, lines_value):
-            types = a.split(",")
-            values = b.split(",")
-            for a_, b_ in zip(types, values):
-                if len(a_) > 0:
-                    result.append(a_ + ": " + b_)
-        return str(result)
-
+            for a, b in zip(lines_type, lines_value):
+                types = a.split(",")
+                values = b.split(",")
+                for a_, b_ in zip(types, values):
+                    if len(a_) > 0:
+                        result.append(a_ + ": " + b_)
+            return str(result)
+        except Exception as e:
+            return ""
     def export_dataset_sql(self, num_per_query=100):
+        '''
+        Read all csv containing information about repo and (repo_info.csv, ..).
+        Then using that information it retrieves all data about methods and store it in @self.query
+        You can choose how many method to insert into a single query
+        Information about minimum and maximum number of lines and tokens are used to exclude specific methods.
+        '''
         f = FileManager("export/repo_info.csv")
         repo_dict = f.read_csv()
 
@@ -108,7 +128,7 @@ class DatasetMining:
         repos_url = repo_dict["URL"]
         repos_commit = repo_dict["COMMIT"]
 
-        rows=list()
+        rows = list()
 
         for id, name, url, commit in zip(repos_id, repos_name, repos_url, repos_commit):
             f = FileManager("export/{}/file_info.csv".format(id))
@@ -118,8 +138,8 @@ class DatasetMining:
                 continue
 
             file_ids = file_dict["ID"]
-            file_names=file_dict["NAME"]
-            number_methods=file_dict["NUMBER_METHODS"]
+            file_names = file_dict["NAME"]
+            number_methods = file_dict["NUMBER_METHODS"]
 
             for file_id, file_name, number_method in zip(file_ids, file_names, number_methods):
                 method_path = "export/{}/{}/method_info.csv".format(id, file_id)
@@ -139,11 +159,11 @@ class DatasetMining:
                 ends = method_dict["END"]
 
                 for method_id, num_tokens, num_lines, nested, already_required, is_abs_ok, start, end in zip(method_ids,
-                                                                                                 method_num_tokens,
-                                                                                                 method_num_lines,
-                                                                                                 method_nested,
-                                                                                                 abstraction_required,
-                                                                                                 abstraction_ok,
+                                                                                                             method_num_tokens,
+                                                                                                             method_num_lines,
+                                                                                                             method_nested,
+                                                                                                             abstraction_required,
+                                                                                                             abstraction_ok,
                                                                                                              starts,
                                                                                                              ends):
 
@@ -161,14 +181,13 @@ class DatasetMining:
                         map_file = "./export/{}/{}/{}/abstract.java.map".format(id, file_id, method_id)
                         code_tokens = "./export/{}/{}/{}/tokens.txt".format(id, file_id, method_id)
 
-
-                        row=list()
+                        row = list()
                         row.append(str(id))
                         row.append(str(file_id))
                         row.append(str(method_id))
-                        row.append(self.format_string( "\n".join(self.read_file_txt(java_file))))
-                        row.append(self.format_string( "\n".join(self.read_file_txt(code_tokens))))
-                        row.append(self.format_string( "\n".join(self.read_file_txt(abstract_file))))
+                        row.append(self.format_string("\n".join(self.read_file_txt(java_file))))
+                        row.append(self.format_string("\n".join(self.read_file_txt(code_tokens))))
+                        row.append(self.format_string("\n".join(self.read_file_txt(abstract_file))))
                         row.append(self.format_string((self.process_map(map_file))))
                         row.append(self.format_string(name))
                         row.append(self.format_string(url))
@@ -184,10 +203,10 @@ class DatasetMining:
 
                         if len(rows) % num_per_query == 0:
                             self.update_queries(rows)
-                            rows=list()
+                            rows = list()
 
         if len(rows) > 0:
             self.update_queries(rows)
-            rows=list()
+            rows = list()
 
         self.export_query_to_file("sample.sql")

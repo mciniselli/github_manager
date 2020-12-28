@@ -4,7 +4,6 @@ from repoManager.condition import Condition
 from typing import List
 import os
 import bs4
-import sys
 import codecs
 
 from subprocess import Popen, PIPE, STDOUT
@@ -15,6 +14,11 @@ import re
 
 class Method():
     def __init__(self, xml_code: bs4.element.ResultSet, id: int, abstraction: bool = False):
+        '''
+        this class contains all information about the method itself (included the list of conditions)
+        if we pass @abstraction = True we can abstract the method. This operation can be done using abstraction.py file
+        in another step
+        '''
         self.xml = xml_code
         self.id = id
         self.raw_code = xml_code.__str__()
@@ -52,6 +56,9 @@ class Method():
 
 
     def abstract_method(self):
+        '''
+        this function allows you to abstract the method using Src2Abs
+        '''
         try:
             abstraction_folder = "abstraction/temp"
             abstraction_jar = "abstraction"
@@ -100,7 +107,9 @@ class Method():
         f.close()
 
     def add_conditions(self):
-
+        '''
+        this function allows you to add all if conditions contained in the method
+        '''
         parser = SrcmlParser(self.raw_code)
 
         if_conditions = parser.extract_all_tags("if", parser.soup)
@@ -113,6 +122,10 @@ class Method():
             condition.check_condition()
 
     def post_process_token(self, tokens: List[str], keep_spaces: bool):
+        '''
+        This function post process the list of tokens. It removes spaces contained in the tokens
+        (e.g. "void " -> "void") and manage the spaces (if we want to consider them as a token)
+        '''
         new_tokens = list()
         for t in tokens:
             if len(t) == 0:
@@ -139,6 +152,10 @@ class Method():
         return new_tokens
 
     def extract_list_of_tokens(self, node: bs4.element.Tag, keep_spaces: bool = True):
+        '''
+        this function allows you to extract the list of all tokens.
+        if @keep_spaces = True we consider all spaces as tokens, otherwise we remove them
+        '''
         result = list()
         index_local = 0
         for c in node.recursiveChildGenerator():
@@ -149,6 +166,10 @@ class Method():
         return result
 
     def exist_nested_method(self):
+        '''
+        this function check if there are other method inside that method (it can happen in java)
+        We do not want to process nested methods
+        '''
         res = self.xml.select("function")
         res2 = self.xml.select("constructor")
         if len(res) + len(res2) > 0:
