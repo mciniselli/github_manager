@@ -82,6 +82,7 @@ preliminary_test
 cloning_folder
 export
 test
+T5_pretrain
 
 # Specific file extension if root folder
 *.txt

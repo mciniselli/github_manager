@@ -1,5 +1,6 @@
 from repoManager.store import FileManager
 import codecs
+import os
 
 
 class DatasetMining:
@@ -7,7 +8,7 @@ class DatasetMining:
         '''
         This class allows you to create the sql method table. It contains information about method (e.g. code, abstract_code)
         If you do not have abstracted method, the abstract column will be empty
-        You can generate tokens via abstraction or via tokex_extraction.py file.
+        You can generate tokens via abstraction or via token_extraction.py file.
         The schema for the database is the following:
 
         CREATE TABLE IF NOT EXISTS method (
@@ -113,6 +114,7 @@ class DatasetMining:
             return str(result)
         except Exception as e:
             return ""
+
     def export_dataset_sql(self, num_per_query=100):
         '''
         Read all csv containing information about repo and (repo_info.csv, ..).
@@ -210,3 +212,77 @@ class DatasetMining:
             rows = list()
 
         self.export_query_to_file("sample.sql")
+
+    def export_dataset_T5_pretrain(self):
+        '''
+        Read all csv containing information about repo and (repo_info.csv, ..).
+        Then using that information it retrieves all data about methods and save in T5_pretrain folder the method
+        required for T5 pretraining. It saves also the key.txt file with keys for mapping the data.
+        Key is formed by repo_id, file_id and method_id, with an underscore between them
+        '''
+        f = FileManager("export/repo_info.csv")
+        repo_dict = f.read_csv()
+
+        repos_name = repo_dict["NAME"]
+        repos_id = repo_dict["ID"]
+        repos_url = repo_dict["URL"]
+        repos_commit = repo_dict["COMMIT"]
+
+        if not os.path.exists("T5_pretrain"):
+            os.makedirs("T5_pretrain")
+
+        key_file_manager = FileManager("T5_pretrain/keys.txt")
+        key_file_manager.open_file_txt("w+")
+
+        code_file_manager = FileManager("T5_pretrain/code.txt")
+        code_file_manager.open_file_txt("w+")
+
+        for id, name, url, commit in zip(repos_id, repos_name, repos_url, repos_commit):
+            f = FileManager("export/{}/file_info.csv".format(id))
+            file_dict = f.read_csv()
+
+            if len(file_dict.keys()) == 0:
+                continue
+
+            file_ids = file_dict["ID"]
+            file_names = file_dict["NAME"]
+            number_methods = file_dict["NUMBER_METHODS"]
+
+            for file_id, file_name, number_method in zip(file_ids, file_names, number_methods):
+                method_path = "export/{}/{}/method_info.csv".format(id, file_id)
+                f = FileManager(method_path)
+                method_dict = f.read_csv()
+
+                if len(method_dict.keys()) == 0:
+                    continue
+
+                method_ids = method_dict["ID"]
+                method_num_tokens = method_dict["NUM_TOKENS"]
+                method_num_lines = method_dict["NUM_LINES"]
+                method_nested = method_dict["HAS_NESTED_METHOD"]
+
+                keys = list()
+                codes = list()
+
+                for method_id, num_tokens, num_lines, nested in zip(method_ids,
+                                                                    method_num_tokens,
+                                                                    method_num_lines,
+                                                                    method_nested):
+                    num_tokens = int(num_tokens)
+                    num_lines = int(num_lines)
+                    if nested == "True":
+                        continue
+
+                    if num_tokens >= self.min_tokens and num_tokens <= self.max_tokens and num_lines >= self.min_lines and num_lines <= self.max_lines:
+                        java_file = "./export/{}/{}/{}/source.java".format(id, file_id, method_id)
+
+                        key = "{}_{}_{}".format(id, file_id, method_id)
+                        code = " ".join(self.read_file_txt(java_file))
+                        keys.append(key)
+                        codes.append(code)
+
+                for k in keys:
+                    key_file_manager.write_file_txt(k)
+
+                for c in codes:
+                    code_file_manager.write_file_txt(c)
