@@ -2,6 +2,8 @@ from repoManager.store import FileManager
 import codecs
 import os
 
+import utils.settings as settings
+
 
 class DatasetMining:
     def __init__(self, min_tokens: int = 0, max_tokens: int = 9999999, min_lines: int = 0, max_lines: int = 9999999, num_max:int = 100):
@@ -36,6 +38,9 @@ class DatasetMining:
         self.max_lines = max_lines
         self.num_max = num_max
         self.query = list()
+
+        self.log = settings.logger
+
 
     def format_string(self, code):
         '''
@@ -247,6 +252,8 @@ class DatasetMining:
 
             num_methods=0
             do_break = False
+
+            self.log.info("Process repo {} - {}".format(id, name))
 
             file_ids = file_dict["ID"]
             file_names = file_dict["NAME"]
