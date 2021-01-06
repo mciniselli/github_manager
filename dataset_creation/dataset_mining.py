@@ -4,7 +4,7 @@ import os
 
 
 class DatasetMining:
-    def __init__(self, min_tokens: int = 0, max_tokens: int = 9999999, min_lines: int = 0, max_lines: int = 9999999):
+    def __init__(self, min_tokens: int = 0, max_tokens: int = 9999999, min_lines: int = 0, max_lines: int = 9999999, num_max:int = 100):
         '''
         This class allows you to create the sql method table. It contains information about method (e.g. code, abstract_code)
         If you do not have abstracted method, the abstract column will be empty
@@ -34,6 +34,7 @@ class DatasetMining:
         self.max_tokens = max_tokens
         self.min_lines = min_lines
         self.max_lines = max_lines
+        self.num_max = num_max
         self.query = list()
 
     def format_string(self, code):
@@ -244,6 +245,9 @@ class DatasetMining:
             if len(file_dict.keys()) == 0:
                 continue
 
+            num_methods=0
+            do_break = False
+
             file_ids = file_dict["ID"]
             file_names = file_dict["NAME"]
             number_methods = file_dict["NUMBER_METHODS"]
@@ -255,6 +259,9 @@ class DatasetMining:
 
                 if len(method_dict.keys()) == 0:
                     continue
+
+                if do_break:
+                    break
 
                 method_ids = method_dict["ID"]
                 method_num_tokens = method_dict["NUM_TOKENS"]
@@ -280,6 +287,13 @@ class DatasetMining:
                         code = " ".join(self.read_file_txt(java_file))
                         keys.append(key)
                         codes.append(code)
+
+                        num_methods +=1
+
+                        if num_methods >= self.num_max:
+                            do_break=True
+                            break
+
 
                 for k in keys:
                     key_file_manager.write_file_txt(k)

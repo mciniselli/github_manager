@@ -200,8 +200,8 @@ def fix_condition_id():
                 c.close_file()
 
 
-def T5_pretrain(parameter):
-    dataset_mining = DatasetMining(*parameter)
+def T5_pretrain(parameter, num_max):
+    dataset_mining = DatasetMining(*parameter, num_max)
     dataset_mining.export_dataset_T5_pretrain()
 
 
@@ -244,6 +244,9 @@ def main():
 
     parser.add_argument("-t5_pretrain", "--t5_pretrain", action="store_true",
                         help="create files for T5 pretrain")
+
+    parser.add_argument("-num_max", "--num_max", type=int, default=500,
+                        help="maximum number of methods extracted from the same repo for T5_pretrain")
 
     parser.add_argument("-p", "--parameter", type=str, default="0_9999999_0_9999999",
                         help="default parameters for analysis and abstraction. You have to write min number of tokens, max number of tokens,"
@@ -295,7 +298,10 @@ def main():
         fix_condition_id()
 
     if args.t5_pretrain:
-        T5_pretrain(parameter_list)
+
+        num_max=args.num_max
+
+        T5_pretrain(parameter_list, num_max)
 
 if __name__ == "__main__":
     main()
