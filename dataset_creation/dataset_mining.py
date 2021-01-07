@@ -1,7 +1,7 @@
 from repoManager.store import FileManager
 import codecs
 import os
-
+import string
 import utils.settings as settings
 
 
@@ -292,6 +292,18 @@ class DatasetMining:
 
                         key = "{}_{}_{}".format(id, file_id, method_id)
                         code = " ".join(self.read_file_txt(java_file))
+
+
+                        bb = ''
+                        for char in code:
+                            if char in string.printable:
+                                bb += char
+                        # there are some strange characters that can give some problems
+                        if len(bb) != len(code):
+                            continue
+
+
+
                         keys.append(key)
                         codes.append(code)
 
