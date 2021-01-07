@@ -6,7 +6,8 @@ import utils.settings as settings
 
 
 class DatasetMining:
-    def __init__(self, min_tokens: int = 0, max_tokens: int = 9999999, min_lines: int = 0, max_lines: int = 9999999, num_max:int = 100):
+    def __init__(self, min_tokens: int = 0, max_tokens: int = 9999999, min_lines: int = 0, max_lines: int = 9999999,
+                 num_max: int = 100):
         '''
         This class allows you to create the sql method table. It contains information about method (e.g. code, abstract_code)
         If you do not have abstracted method, the abstract column will be empty
@@ -40,7 +41,6 @@ class DatasetMining:
         self.query = list()
 
         self.log = settings.logger
-
 
     def format_string(self, code):
         '''
@@ -223,8 +223,9 @@ class DatasetMining:
         '''
         Read all csv containing information about repo and (repo_info.csv, ..).
         Then using that information it retrieves all data about methods and save in T5_pretrain folder the method
-        required for T5 pretraining. It saves also the key.txt file with keys for mapping the data.
-        Key is formed by repo_id, file_id and method_id, with an underscore between them
+        required for T5 pretraining. It saves also the keys.csv file containing all information about each method.
+        A summary containing the number of methods for each repo is saved in summary.csv file.
+        To avoid problem we skip all the methods that contain non printable characters
         '''
         f = FileManager("export/repo_info.csv")
         repo_dict = f.read_csv()
@@ -237,11 +238,19 @@ class DatasetMining:
         if not os.path.exists("T5_pretrain"):
             os.makedirs("T5_pretrain")
 
-        key_file_manager = FileManager("T5_pretrain/keys.txt")
-        key_file_manager.open_file_txt("w+")
+        fields_key = ["ID REPO", "NAME REPO", "URL REPO", "COMMIT", "ID FILE", "NAME FILE", "ID METHOD",
+                      "START", "END", "NUM_TOKENS", "NUM_LINES"]
+
+        key_file_manager = FileManager("T5_pretrain/keys.csv")
+        key_file_manager.open_file_csv("w+", fields_key)
 
         code_file_manager = FileManager("T5_pretrain/code.txt")
         code_file_manager.open_file_txt("w+")
+
+        fields_summary = ["ID REPO", "NAME REPO", "URL", "COMMIT", "NUM_TOTAL_METHODS", "NUM_SELECTED_METHODS"]
+
+        summary_file_manager = FileManager("T5_pretrain/summary.csv")
+        summary_file_manager.open_file_csv("w+", fields_summary)
 
         for id, name, url, commit in zip(repos_id, repos_name, repos_url, repos_commit):
             f = FileManager("export/{}/file_info.csv".format(id))
@@ -250,8 +259,10 @@ class DatasetMining:
             if len(file_dict.keys()) == 0:
                 continue
 
-            num_methods=0
+            num_methods = 0  # method selected
             do_break = False
+
+            num_total_methods = 0
 
             self.log.info("Process repo {} - {}".format(id, name))
 
@@ -271,17 +282,21 @@ class DatasetMining:
                     break
 
                 method_ids = method_dict["ID"]
+                method_starts = method_dict["START"]
+                method_ends = method_dict["END"]
                 method_num_tokens = method_dict["NUM_TOKENS"]
                 method_num_lines = method_dict["NUM_LINES"]
                 method_nested = method_dict["HAS_NESTED_METHOD"]
 
-                keys = list()
                 codes = list()
+                keys = list()
 
-                for method_id, num_tokens, num_lines, nested in zip(method_ids,
-                                                                    method_num_tokens,
-                                                                    method_num_lines,
-                                                                    method_nested):
+                num_total_methods += int(number_method)
+
+                for method_id, start, end, num_tokens, num_lines, nested in zip(method_ids, method_starts, method_ends,
+                                                                                method_num_tokens,
+                                                                                method_num_lines,
+                                                                                method_nested):
                     num_tokens = int(num_tokens)
                     num_lines = int(num_lines)
                     if nested == "True":
@@ -290,9 +305,10 @@ class DatasetMining:
                     if num_tokens >= self.min_tokens and num_tokens <= self.max_tokens and num_lines >= self.min_lines and num_lines <= self.max_lines:
                         java_file = "./export/{}/{}/{}/source.java".format(id, file_id, method_id)
 
-                        key = "{}_{}_{}".format(id, file_id, method_id)
                         code = " ".join(self.read_file_txt(java_file))
 
+                        key = [str(id), name, url, commit, str(file_id), file_name, str(method_id), start, end,
+                               str(num_tokens), str(num_lines)]
 
                         bb = ''
                         for char in code:
@@ -302,20 +318,31 @@ class DatasetMining:
                         if len(bb) != len(code):
                             continue
 
-
-
-                        keys.append(key)
                         codes.append(code)
+                        keys.append(key)
 
-                        num_methods +=1
+                        num_methods += 1
 
                         if num_methods >= self.num_max:
-                            do_break=True
+                            do_break = True
                             break
 
-
                 for k in keys:
-                    key_file_manager.write_file_txt(k)
+                    dict_method = dict()
+                    for x, y in zip(fields_key, k):
+                        dict_method[x] = y
+                    key_file_manager.write_file_csv(dict_method)
 
                 for c in codes:
                     code_file_manager.write_file_txt(c)
+
+            summary = [str(id), name, url, commit, str(num_total_methods), str(num_methods)]
+
+            dict_method = dict()
+            for x, y in zip(fields_summary, summary):
+                dict_method[x] = y
+            summary_file_manager.write_file_csv(dict_method)
+            summary_file_manager.file.flush()
+
+
+

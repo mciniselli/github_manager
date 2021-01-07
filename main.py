@@ -215,7 +215,7 @@ def main():
     parser.add_argument("-s", "--start", type=int, default=0,
                         help="The start index for repositories to process")
 
-    parser.add_argument("-e", "--end", type=int, default=0,
+    parser.add_argument("-e", "--end", type=int, default=999999,
                         help="The end index for repositories to process")
 
     parser.add_argument("-f", "--filepath", type=str, default="json_data/results.json",
@@ -245,7 +245,7 @@ def main():
     parser.add_argument("-t5_pretrain", "--t5_pretrain", action="store_true",
                         help="create files for T5 pretrain")
 
-    parser.add_argument("-num_max", "--num_max", type=int, default=500,
+    parser.add_argument("-num_max", "--num_max", type=int, default=1500,
                         help="maximum number of methods extracted from the same repo for T5_pretrain")
 
     parser.add_argument("-p", "--parameter", type=str, default="0_9999999_0_9999999",
