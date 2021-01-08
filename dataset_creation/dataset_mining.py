@@ -242,7 +242,7 @@ class DatasetMining:
                       "START", "END", "NUM_TOKENS", "NUM_LINES"]
 
         key_file_manager = FileManager("T5_pretrain/keys.csv")
-        key_file_manager.open_file_csv("w+", fields_key)
+        key_file_manager.open_file_csv("w+", fields_key, True)
 
         code_file_manager = FileManager("T5_pretrain/code.txt")
         code_file_manager.open_file_txt("w+")
@@ -250,7 +250,7 @@ class DatasetMining:
         fields_summary = ["ID REPO", "NAME REPO", "URL", "COMMIT", "NUM_TOTAL_METHODS", "NUM_SELECTED_METHODS"]
 
         summary_file_manager = FileManager("T5_pretrain/summary.csv")
-        summary_file_manager.open_file_csv("w+", fields_summary)
+        summary_file_manager.open_file_csv("w+", fields_summary, True)
 
         for id, name, url, commit in zip(repos_id, repos_name, repos_url, repos_commit):
             f = FileManager("export/{}/file_info.csv".format(id))
